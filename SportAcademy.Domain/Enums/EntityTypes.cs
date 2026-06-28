@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SportAcademy.Domain.Enums
+{
+    public enum EntityTypes
+    {
+        Trainee = 1,
+        Branch,
+        User,
+        Enrollment,
+        Sport,
+        Attendance,
+        Coach,
+        Employee,
+        Session,
+        Payment
+    }
+}

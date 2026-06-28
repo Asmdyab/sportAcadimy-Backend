@@ -1,0 +1,72 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SportAcademy.Application.Commands.SubscriptionDetailsCommands.CreateSubscriptionDetails;
+using SportAcademy.Application.Commands.SubscriptionDetailsCommands.DeleteSubscriptionDetails;
+using SportAcademy.Application.Commands.SubscriptionDetailsCommands.UpdateSubscriptionDetails;
+using SportAcademy.Application.Queries.SubscriptionDetailsQueries.GetAll;
+using SportAcademy.Application.Queries.SubscriptionDetailsQueries.GetById;
+using SportAcademy.Application.Queries.SubscriptionDetailsQueries.GetSubDetailsDropdown;
+
+namespace SportAcademy.Web.Controllers
+{
+    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SubscriptionDetailsController : ControllerBase
+    {
+        IMediator _mediator;
+
+        public SubscriptionDetailsController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var result = await _mediator.Send(new GetAllSubDetailsQuery());
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var result = await _mediator.Send(new GetSubDetailsByIdQuery(id));
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAsync(CreateSubscriptionDetailsCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> EditAsync(UpdateSubscriptionDetailsCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(DeleteSubscriptionDetailsCommand command)
+        {
+            var result = _mediator.Send(command);
+            if (result is null || !result.Result.IsSuccess)
+                return BadRequest(result?.Result.Message);
+
+            return NoContent();
+        }
+
+        [HttpGet("dropdown")]
+        public async Task<IActionResult> GetDropdown(CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetSubDetailsDropdownQuery(), ct);
+            return Ok(result);
+        }
+    }
+
+}
+

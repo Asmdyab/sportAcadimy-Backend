@@ -1,0 +1,130 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SportAcademy.Application.Commands.AttendanceCommands.BulkCreateAttendance;
+using SportAcademy.Application.Commands.AttendanceCommands.CreateAttendance;
+using SportAcademy.Application.Commands.AttendanceCommands.DeleteAttendance;
+using SportAcademy.Application.Commands.AttendanceCommands.UpdateAttendance;
+using SportAcademy.Application.Common.Pagination;
+using SportAcademy.Application.Queries.AttendanceQueries.GetAll;
+using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceByDate;
+using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceBySession;
+using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceRate;
+using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceReport;
+using SportAcademy.Application.Queries.AttendanceQueries.GetById;
+using SportAcademy.Application.Queries.AttendanceQueries.GetGlobalAttendanceRate;
+using SportAcademy.Application.Queries.BranchQueries.GetAll;
+using SportAcademy.Domain.Enums;
+
+namespace SportAcademy.Web.Controllers
+{
+    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AttendanceController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+
+        public AttendanceController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateAttendanceCommand command, CancellationToken ct)
+        {
+            var result = await _mediator.Send(command, ct);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize,
+            CancellationToken ct)
+        {
+            var result = await _mediator.Send(
+                new GetAllAttendancesQuery(PageRequest.Create(page, pageSize)), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id, CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetAttendanceByIdQuery(id), ct);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UpdateAttendanceCommand command,
+            CancellationToken ct)
+        {
+            var result = await _mediator.Send(command, ct);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            var result = await _mediator.Send(new DeleteAttendanceCommand(id), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("session/{sessionOccurrenceId}")]
+        public async Task<IActionResult> GetAttendanceBySession(int sessionOccurrenceId, CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetAttendanceBySessionQuery(sessionOccurrenceId), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("by-date")]
+        public async Task<IActionResult> GetByDate([FromQuery] DateTime date, CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetAttendanceByDateQuery(date), ct);
+            return Ok(result);
+        }
+
+        [HttpPost("bulk")]
+        public async Task<IActionResult> BulkCreate([FromBody] BulkCreateAttendanceCommand command, CancellationToken ct)
+        {
+            var result = await _mediator.Send(command, ct);
+            return Ok(result);
+        }
+
+        [HttpGet("trainee/{traineeId}/rate")]
+        public async Task<IActionResult> GetAttendanceRate(
+            [FromRoute] int traineeId,
+            [FromQuery] DateOnly? from,
+            [FromQuery] DateOnly? to,
+            CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetAttendanceRateQuery(
+                    traineeId, from, to
+                ), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("rate")]
+        public async Task<IActionResult> GetAttendanceRate(
+            [FromQuery] Month? month,
+            CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetGlobalAttendanceRateQuery(month), ct);
+            return Ok(result);
+        }
+
+
+        // GET api/attendance/report?page=1&pageSize=10
+        [AllowAnonymous]
+        [HttpGet("report")]
+        public async Task<IActionResult> GetAttendanceReport(
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize,
+            CancellationToken ct)
+        {
+            var result = await _mediator.Send(
+                new GetAttendanceReportQuery(page, pageSize), ct);
+            return Ok(result);
+        }
+    }
+}

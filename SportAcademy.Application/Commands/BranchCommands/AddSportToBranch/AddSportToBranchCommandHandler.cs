@@ -1,0 +1,52 @@
+﻿using MediatR;
+using SportAcademy.Application.Common.Result;
+using SportAcademy.Application.Interfaces;
+using SportAcademy.Domain.Entities;
+using SportAcademy.Domain.Enums;
+using SportAcademy.Domain.Exceptions.BranchExceptions;
+using SportAcademy.Domain.Exceptions.SharedExceptions;
+using SportAcademy.Domain.Exceptions.SportExceptions;
+
+namespace SportAcademy.Application.Commands.BranchCommands.AddSportToBranch
+{
+    public class AddSportToBranchCommandHandler : IRequestHandler<AddSportToBranchCommand, Result<string>>
+    {
+        private readonly IBranchRepository _branchRepository;
+        private readonly ISportRepository _sportRepository;
+        private readonly ISportBranchRepository _sportBranchRepository;
+        private readonly string _operationType = OperationType.Add.ToString();
+
+        public AddSportToBranchCommandHandler(
+            IBranchRepository branchRepository,
+            ISportRepository sportRepository,
+            ISportBranchRepository sportBranchRepository)
+        {
+            _branchRepository = branchRepository;
+            _sportRepository = sportRepository;
+            _sportBranchRepository = sportBranchRepository;
+        }
+
+        public async Task<Result<string>> Handle(AddSportToBranchCommand request, CancellationToken cancellationToken)
+        {
+            var branch = await _branchRepository.GetByIdAsync(request.BranchId, cancellationToken)
+                ?? throw new BranchNotFoundException(request.BranchId.ToString());
+
+            var sport = await _sportRepository.GetByIdAsync(request.SportId, cancellationToken)
+                ?? throw new SportNotFoundException(request.SportId.ToString());
+
+            var exists = await _sportBranchRepository.IsExistAsync(request.SportId, request.BranchId, cancellationToken);
+            if (exists)
+                throw new ConflictException(nameof(Sport), nameof(Branch));
+
+            var sportBranch = new SportBranch
+            {
+                SportId = request.SportId,
+                BranchId = request.BranchId
+            };
+
+            await _sportBranchRepository.AddAsync(sportBranch, cancellationToken);
+
+            return Result<string>.Success("Sport added to branch successfully.", _operationType);
+        }
+    }
+}
