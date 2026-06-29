@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SportAcademy.Application.Interfaces;
+using SportAcademy.Domain.Entities;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -40,6 +41,46 @@ public class OpenRouterClient : IOpenRouterClient
         httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
         httpRequest.Headers.Add("HTTP-Referer", "https://sportacademy.app");
         httpRequest.Headers.Add("X-Title", "SportAcademy Video Analysis");
+
+        httpRequest.Content = new StringContent(
+            JsonSerializer.Serialize(request),
+            Encoding.UTF8,
+            "application/json");
+
+        var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new HttpRequestException(
+                $"OpenRouter API error ({response.StatusCode}): {json}");
+        }
+
+        using var doc = JsonDocument.Parse(json);
+        return doc.RootElement
+            .GetProperty("choices")[0]
+            .GetProperty("message")
+            .GetProperty("content")
+            .GetString()!;
+    }
+
+    public async Task<string> SendMessagesAsync(
+        IReadOnlyList<OpenAiMessage> messages,
+        CancellationToken cancellationToken)
+    {
+        var request = new
+        {
+            model = _model,
+            messages = messages.Select(m => new { role = m.Role.ToString().ToLowerInvariant(), content = m.Content })
+        };
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post,
+            "https://openrouter.ai/api/v1/chat/completions");
+
+        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        httpRequest.Headers.Add("HTTP-Referer", "https://sportacademy.app");
+        httpRequest.Headers.Add("X-Title", "SportAcademy Chatbot");
 
         httpRequest.Content = new StringContent(
             JsonSerializer.Serialize(request),

@@ -5,6 +5,7 @@ using SportAcademy.Application.Commands.ChatCommands.AddMessage;
 using SportAcademy.Application.Commands.ChatCommands.CreateConversation;
 using SportAcademy.Application.Commands.ChatCommands.SendMessageToBot;
 using SportAcademy.Application.Queries.ChatQueries;
+using SportAcademy.Application.Queries.ChatQueries.GetAllConversations;
 
 
 namespace SportAcademy.Web.Controllers;
@@ -46,6 +47,13 @@ public class ChatController : ControllerBase
     public async Task<IActionResult> GetHistory(Guid conversationId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetConversationByIdQuery(conversationId), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("conversations")]
+    public async Task<IActionResult> GetConversations(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetAllConversationsQuery(), cancellationToken);
         return Ok(result);
     }
 }

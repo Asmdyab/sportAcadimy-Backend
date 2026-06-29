@@ -17,7 +17,6 @@ using SportAcademy.Domain.Contract;
 using SportAcademy.Domain.Entities;
 using SportAcademy.Domain.Services;
 using SportAcademy.Infrastructure.Implementations;
-using SportAcademy.Infrastructure.Implementations.OpenAi;
 using SportAcademy.Infrastructure.Implementations.OpenRouter;
 using SportAcademy.Infrastructure.Notifications;
 using SportAcademy.Infrastructure.Persistence.DBContext;
@@ -198,8 +197,6 @@ builder.Services.AddScoped<IChatConversationRepository, ChatConversationReposito
 builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 
 builder.Services.AddScoped<IChatBotService, ChatBotService>();
-
-builder.Services.AddHttpClient<IOpenAiChatClient, OpenAiChatClient>();
 
 builder.Services.AddHttpClient<IOpenRouterClient, OpenRouterClient>();
 

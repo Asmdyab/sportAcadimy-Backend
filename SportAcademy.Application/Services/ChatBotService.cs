@@ -6,14 +6,14 @@ namespace SportAcademy.Application.Services
     public class ChatBotService : IChatBotService
     {
         private readonly IChatMessageRepository _messageRepository;
-        private readonly IOpenAiChatClient _openAiClient;
+        private readonly IOpenRouterClient _openRouterClient;
 
         public ChatBotService(
             IChatMessageRepository messageRepository,
-            IOpenAiChatClient openAiClient)
+            IOpenRouterClient openRouterClient)
         {
             _messageRepository = messageRepository;
-            _openAiClient = openAiClient;
+            _openRouterClient = openRouterClient;
         }
 
         public async Task<string> GenerateBotReplyAsync(
@@ -32,8 +32,8 @@ namespace SportAcademy.Application.Services
                 })
                 .ToList();
 
-            // call AI
-            var response = await _openAiClient.SendAsync(aiMessages, cancellationToken);
+            // call AI via OpenRouter
+            var response = await _openRouterClient.SendMessagesAsync(aiMessages, cancellationToken);
 
             return response;
         }

@@ -17,14 +17,17 @@ namespace SportAcademy.Application.Commands.ChatCommands.CreateConversation
     : IRequestHandler<CreateConversationCommand, Result<ChatConversationDto>>
     {
         private readonly IChatConversationRepository _conversationRepository;
+        private readonly IUserContextService _userContext;
         private readonly IMapper _mapper;
         private readonly string _operation = OperationType.Add.ToString();
 
         public CreateConversationCommandHandler(
             IChatConversationRepository conversationRepository,
+            IUserContextService userContext,
             IMapper mapper)
         {
             _conversationRepository = conversationRepository;
+            _userContext = userContext;
             _mapper = mapper;
         }
 
@@ -36,6 +39,7 @@ namespace SportAcademy.Application.Commands.ChatCommands.CreateConversation
             {
                 Id = Guid.NewGuid(),
                 Title = request.Title,
+                UserId = _userContext.UserId,
                 CreatedAt = DateTime.UtcNow
             };
 

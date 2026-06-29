@@ -21,6 +21,10 @@ namespace SportAcademy.Infrastructure.Persistence.Configurations
             builder.Property(x => x.Title)
                 .HasMaxLength(100);
 
+            builder.Property(x => x.UserId)
+                .HasMaxLength(450)
+                .IsRequired();
+
             builder.Property(x => x.CreatedAt)
                 .IsRequired();
 
