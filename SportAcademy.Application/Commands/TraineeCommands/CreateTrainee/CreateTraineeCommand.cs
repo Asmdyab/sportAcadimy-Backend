@@ -10,7 +10,12 @@ namespace SportAcademy.Application.Commands.Trainees.CreateTrainee
         public required string FirstName { get; init; }
         public required string LastName { get; init; }
         public required string SSN { get; init; }
-        public int FamilyId { get; set; }
+        public required string PhoneNumber { get; init; }
+        public string Email { get; init; } = null!;
+        public string Street { get; init; } = null!;
+        public string City { get; init; } = null!;
+        public Nationality Nationality { get; init; }
+        public int FamilyId { get; init; }
         public int NationalityCategoryId { get; set; }
         public string? ParentNumber { get; init; }
         public string? GuardianName { get; init; }

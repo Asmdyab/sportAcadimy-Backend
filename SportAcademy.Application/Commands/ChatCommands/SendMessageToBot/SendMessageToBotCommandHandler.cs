@@ -34,28 +34,35 @@ namespace SportAcademy.Application.Commands.ChatCommands.SendMessageToBot
             SendMessageToBotCommand request,
             CancellationToken cancellationToken)
         {
-            // 1️⃣ تأكد أن المحادثة موجودة
             var conversation = await _conversationRepository
                 .GetByIdAsync(request.ConversationId, cancellationToken)
                 ?? throw new ChatConversationNotFoundException(request.ConversationId.ToString());
 
-            // 2️⃣ خزّن رسالة المستخدم
+            var content = request.Message?.Trim() ?? string.Empty;
+
             var userMessage = new OpenAiMessage
             {
                 Id = Guid.NewGuid(),
                 ChatConversationId = conversation.Id,
                 Role = ChatRole.User,
-                Content = request.Message,
+                Content = content,
                 CreatedAt = DateTime.UtcNow
             };
 
             await _messageRepository.AddAsync(userMessage, cancellationToken);
 
-            // 3️⃣ اطلب الرد من الـ Service
-            var reply = await _chatBotService
-                .GenerateBotReplyAsync(conversation.Id, cancellationToken);
+            string reply;
+            try
+            {
+                reply = await _chatBotService
+                    .GenerateBotReplyAsync(conversation.Id, cancellationToken);
+            }
+            catch
+            {
+                await _messageRepository.DeleteAsync(userMessage, cancellationToken);
+                throw;
+            }
 
-            // 4️⃣ خزّن رد البوت
             var botMessage = new OpenAiMessage
             {
                 Id = Guid.NewGuid(),

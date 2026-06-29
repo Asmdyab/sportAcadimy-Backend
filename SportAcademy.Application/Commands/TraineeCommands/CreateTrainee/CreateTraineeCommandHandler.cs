@@ -13,28 +13,36 @@ namespace SportAcademy.Application.Commands.Trainees.CreateTrainee
 {
     public class CreateTraineeCommandHandler : IRequestHandler<CreateTraineeCommand, Result<int>>
     {
-        private readonly ITraineeCodeGenerator _traineeCodeGenerator;
         private readonly IMapper _mapper;
         private readonly ITraineeService _traineeService;
         private readonly ITraineeRepository _traineeRepository;
+        private readonly IFamilyRepository _familyRepository;
         private readonly string _operationType = OperationType.Add.ToString();
 
         public CreateTraineeCommandHandler(
-            ITraineeCodeGenerator traineeCodeGenerator,
             ITraineeService traineeService,
             IMapper mapper,
-            ITraineeRepository traineeRepository)
+            ITraineeRepository traineeRepository,
+            IFamilyRepository familyRepository)
         {
-            _traineeCodeGenerator = traineeCodeGenerator;
             _mapper = mapper;
             _traineeService = traineeService;
             _traineeRepository = traineeRepository;
+            _familyRepository = familyRepository;
         }
 
         public async Task<Result<int>> Handle(CreateTraineeCommand request, CancellationToken cancellationToken)
         {
             var trainee = _mapper.Map<Trainee>(request)
                 ?? throw new AutoMapperMappingException("Error occurred while mapping.");
+
+            if (trainee.FamilyId <= 0)
+            {
+                var families = await _familyRepository.GetAllAsync(cancellationToken);
+                var firstFamily = families.FirstOrDefault();
+                if (firstFamily is not null)
+                    trainee.FamilyId = firstFamily.Id;
+            }
 
             if (!_traineeService.IsSSNValid(trainee.SSN, trainee.BirthDate))
                 throw new SSNSyntaxErrorException();
@@ -59,14 +67,12 @@ namespace SportAcademy.Application.Commands.Trainees.CreateTrainee
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var code = await _traineeCodeGenerator.GenerateAsync(
+            trainee.TraineeCode = await _traineeRepository.GenerateTraineeCodeAsync(
                 trainee.FamilyId,
                 trainee.BranchId,
                 trainee.NationalityCategoryId,
                 ageCategory,
                 cancellationToken);
-
-            trainee.TraineeCode = TraineeCode.FromString(code);
 
             trainee.IsSubscribed = false;
 

@@ -361,5 +361,28 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
 
             return Task.CompletedTask;
         }
+
+        public async Task<TraineeCode> GenerateTraineeCodeAsync(int familyId, int branchId, int nationalityCategoryId, AgeCategory ageCategory, CancellationToken cancellationToken = default)
+        {
+            var nationalityCode = await _context.NationalityCategories
+                .Where(n => n.Id == nationalityCategoryId)
+                .Select(n => n.Code)
+                .FirstOrDefaultAsync(cancellationToken) ?? "XX";
+
+            var ageChar = ageCategory.ToChar();
+            var prefix = $"{ageChar}-{familyId}-{branchId}-{nationalityCode}-";
+
+            var connection = _context.Database.GetDbConnection();
+            if (connection.State != ConnectionState.Open)
+                await connection.OpenAsync(cancellationToken);
+
+            var maxMemberNumber = await connection.QueryFirstOrDefaultAsync<int?>(
+                "SELECT MAX(CAST(RIGHT(TraineeCode, LEN(TraineeCode) - LEN(@Prefix)) AS INT)) FROM Trainees WHERE TraineeCode LIKE @Prefix + '%'",
+                new { Prefix = prefix });
+
+            var nextNumber = (maxMemberNumber ?? 0) + 1;
+
+            return TraineeCode.Create(ageCategory, familyId, branchId, nationalityCode, nextNumber);
+        }
     }
 }

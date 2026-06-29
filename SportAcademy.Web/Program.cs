@@ -202,8 +202,6 @@ builder.Services.AddHttpClient<IOpenRouterClient, OpenRouterClient>();
 
 builder.Services.AddScoped<IVideoAnalysisRepository, VideoAnalysisRepository>();
 
-builder.Services.AddScoped<ITraineeCodeGenerator, SqlTraineeCodeGenerator>();
-
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

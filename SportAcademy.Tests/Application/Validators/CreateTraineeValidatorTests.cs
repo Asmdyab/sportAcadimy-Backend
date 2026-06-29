@@ -15,6 +15,13 @@ public class CreateTraineeValidatorTests
         FirstName = "Ahmed",
         LastName = "Al-Mutairi",
         SSN = "304031512345",
+        PhoneNumber = "51234567",
+        Email = "ahmed@test.com",
+        Street = "Street 1",
+        City = "Salmiya",
+        Nationality = Nationality.Kuwaiti,
+        FamilyId = 1,
+        NationalityCategoryId = 1,
         BirthDate = new DateOnly(2004, 3, 15),
         Gender = Gender.Male,
         BranchId = 1

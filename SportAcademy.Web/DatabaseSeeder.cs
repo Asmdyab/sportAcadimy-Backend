@@ -548,15 +548,7 @@ namespace SportAcademy.Infrastructure.Seeders
                     natCat.Code,
                     memberCounter++);
 
-                // Generate custom trainee ID
-                var year = trainee.BirthDate.Year % 100;
-                var month = trainee.BirthDate.Month;
-                var dobCode = $"{year:D2}{month:D2}";
-                var firstLetter = char.ToUpper(trainee.FirstName[0]);
-                var ascii = ((int)firstLetter).ToString("D2");
-                var prefix = $"{branch.Id}{dobCode}{ascii}";
-                var counter = random.Next(1, 99).ToString("D2");
-                trainee.Id = int.Parse($"{prefix}{counter}");
+
             }
 
             return trainees;

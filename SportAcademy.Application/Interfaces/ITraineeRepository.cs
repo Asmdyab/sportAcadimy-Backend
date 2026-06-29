@@ -1,6 +1,8 @@
 using SportAcademy.Application.Common.Pagination;
 using SportAcademy.Application.DTOs.TraineeDtos;
 using SportAcademy.Domain.Entities;
+using SportAcademy.Domain.Enums;
+using SportAcademy.Domain.ValueObjects;
 
 namespace SportAcademy.Application.Interfaces
 {
@@ -18,5 +20,6 @@ namespace SportAcademy.Application.Interfaces
         Task<PagedData<TraineeCardDto>> SearchAsync(string term, PageRequest page, CancellationToken ct = default);
         Task<PagedData<TraineeCardDto>> SearchByIdAsync(int id, PageRequest page, CancellationToken ct = default);
         Task<List<TraineeDropdownDto>> GetDropdownAsync(CancellationToken cancellationToken = default);
+        Task<TraineeCode> GenerateTraineeCodeAsync(int familyId, int branchId, int nationalityCategoryId, AgeCategory ageCategory, CancellationToken cancellationToken = default);
     }
 }

@@ -19,7 +19,7 @@ namespace SportAcademy.Infrastructure.Persistence.Configurations
             builder.HasKey(t => t.Id);
 
             builder.Property(t => t.Id)
-                .ValueGeneratedNever();
+                .ValueGeneratedOnAdd();
 
             builder.Property(t => t.TraineeCode)
                 .IsRequired()

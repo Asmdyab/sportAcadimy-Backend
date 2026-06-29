@@ -3,6 +3,7 @@ using SportAcademy.Application.Commands.Trainees.UpdateTrainee;
 using SportAcademy.Application.DTOs.SportDtos;
 using SportAcademy.Application.DTOs.TraineeDtos;
 using SportAcademy.Domain.Entities;
+using SportAcademy.Domain.ValueObjects;
 
 namespace SportAcademy.Application.Mappings.TraineeProfile
 {
@@ -61,6 +62,10 @@ namespace SportAcademy.Application.Mappings.TraineeProfile
                         st.Sport.Name
                 )).ToHashSet()))
                 .ReverseMap()
+                .ForMember(dest => dest.Address,
+                    opt => opt.MapFrom(src => Address.Create(src.Street, src.City)))
+                .ForMember(dest => dest.Email,
+                    opt => opt.MapFrom(src => Email.Create(src.Email)))
                 .ForMember(dest => dest.Sports, 
                     opt => opt.MapFrom(src => src.Sports.Select(s => new SportTrainee
                         {

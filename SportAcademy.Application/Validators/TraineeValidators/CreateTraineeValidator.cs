@@ -32,6 +32,28 @@ namespace SportAcademy.Application.Validators.TraineeValidators
             RuleFor(t => t.ParentNumber)
                 .Length(8).WithMessage("Phone number cannot exceed 8 characters.")
                 .When(t => !string.IsNullOrEmpty(t.ParentNumber));
+
+            RuleFor(t => t.PhoneNumber)
+                .NotEmpty().WithMessage("Phone number is required.")
+                .Length(8).WithMessage("Phone number must be 8 characters.");
+
+            RuleFor(t => t.Email)
+                .NotEmpty().WithMessage("Email is required.")
+                .EmailAddress().WithMessage("Invalid email format.");
+
+            RuleFor(t => t.Street)
+                .NotEmpty().WithMessage("Street is required.")
+                .MaximumLength(70).WithMessage("Street cannot exceed 70 characters.");
+
+            RuleFor(t => t.City)
+                .NotEmpty().WithMessage("City is required.")
+                .MaximumLength(50).WithMessage("City cannot exceed 50 characters.");
+
+            RuleFor(t => t.Nationality)
+                .IsInEnum().WithMessage("Invalid nationality.");
+
+            RuleFor(t => t.NationalityCategoryId)
+                .GreaterThan(0).WithMessage("Nationality category is required.");
         }
     }
 }
