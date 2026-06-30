@@ -57,6 +57,7 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
         public async Task<PagedData<BranchCardDto>> SearchAsync(string term, PageRequest page, CancellationToken cancellationToken = default)
             => await _context.Branchs
                 .Where(b => b.Name.Contains(term) || b.City.Contains(term) || b.Country.Contains(term))
+                .OrderByDescending(b => b.Id)
                 .ProjectTo<BranchCardDto>(_mapper.ConfigurationProvider)
                 .ToPagedDataAsync(page, cancellationToken);
 
