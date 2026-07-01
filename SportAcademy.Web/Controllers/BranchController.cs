@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using SportAcademy.Application.Commands.BranchCommands.AddSportToBranch;
 using SportAcademy.Application.Commands.BranchCommands.CreateBranch;
 using SportAcademy.Application.Commands.BranchCommands.DeactivateBranch;
+using SportAcademy.Application.Commands.BranchCommands.ActivateBranch;
 using SportAcademy.Application.Commands.BranchCommands.DeleteBranch;
 using SportAcademy.Application.Commands.BranchCommands.UpdateBranch;
 using SportAcademy.Application.Common.Pagination;
@@ -126,6 +127,13 @@ namespace SportAcademy.Web.Controllers
         public async Task<IActionResult> Deactivate(int id, CancellationToken ct)
         {
             var result = await _mediator.Send(new DeactivateBranchCommand(id), ct);
+            return Ok(result);
+        }
+
+        [HttpPatch("{id}/activate")]
+        public async Task<IActionResult> Activate(int id, CancellationToken ct)
+        {
+            var result = await _mediator.Send(new ActivateBranchCommand(id), ct);
             return Ok(result);
         }
     }

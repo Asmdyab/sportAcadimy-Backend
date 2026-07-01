@@ -38,7 +38,7 @@ namespace SportAcademy.Web.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateSportCommand command, CancellationToken ct)
         {
-            var result = await _mediator.Send(command, ct);
+            var result = await _mediator.Send(command with { Id = id }, ct);
             return Ok(result);
         }
 

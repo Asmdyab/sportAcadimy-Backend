@@ -215,7 +215,7 @@ builder.Services.AddScoped<IVideoAnalysisRepository, VideoAnalysisRepository>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(null, false));
     });
 
 builder.Services.AddEndpointsApiExplorer();
