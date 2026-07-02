@@ -87,7 +87,7 @@ public class CreateEmployeeCommandHandlerTests
         _employeeRepoMock.Setup(r => r.IsPhoneNumberExistAsync(employee.PhoneNumber, 0, It.IsAny<CancellationToken>())).ReturnsAsync(false);
         _personServiceMock.Setup(s => s.GenerateUserName(employee.FirstName, employee.LastName)).Returns("mohammad.al-sabah");
         _personServiceMock.Setup(s => s.GeneratePassword()).Returns("TempPass123!");
-        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>())).ReturnsAsync(Microsoft.AspNetCore.Identity.IdentityResult.Success);
+        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Microsoft.AspNetCore.Identity.IdentityResult.Success);
         _userRepoMock.Setup(r => r.GetByUsernameAsync("mohammad.al-sabah", It.IsAny<CancellationToken>())).ReturnsAsync(appUser);
         _employeeRepoMock.Setup(r => r.AddAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
@@ -98,7 +98,7 @@ public class CreateEmployeeCommandHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Data.Should().BeGreaterThan(0);
         _employeeRepoMock.Verify(r => r.AddAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()), Times.Once);
-        _userRepoMock.Verify(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>()), Times.Once);
+        _userRepoMock.Verify(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class CreateEmployeeCommandHandlerTests
         _employeeRepoMock.Setup(r => r.IsPhoneNumberExistAsync(employee.PhoneNumber, 0, It.IsAny<CancellationToken>())).ReturnsAsync(false);
         _personServiceMock.Setup(s => s.GenerateUserName(employee.FirstName, employee.LastName)).Returns("mohammad.al-sabah");
         _personServiceMock.Setup(s => s.GeneratePassword()).Returns("TempPass123!");
-        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>())).ReturnsAsync(failedResult);
+        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(failedResult);
 
         // Act & Assert
         var act = () => _handler.Handle(command, CancellationToken.None);
@@ -202,7 +202,7 @@ public class CreateEmployeeCommandHandlerTests
         _employeeRepoMock.Setup(r => r.IsPhoneNumberExistAsync(employee.PhoneNumber, 0, It.IsAny<CancellationToken>())).ReturnsAsync(false);
         _personServiceMock.Setup(s => s.GenerateUserName(employee.FirstName, employee.LastName)).Returns("mohammad.al-sabah");
         _personServiceMock.Setup(s => s.GeneratePassword()).Returns("TempPass123!");
-        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>())).ReturnsAsync(Microsoft.AspNetCore.Identity.IdentityResult.Success);
+        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Microsoft.AspNetCore.Identity.IdentityResult.Success);
         _userRepoMock.Setup(r => r.GetByUsernameAsync("mohammad.al-sabah", It.IsAny<CancellationToken>())).ReturnsAsync(appUser);
         _employeeRepoMock.Setup(r => r.AddAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>()))
             .Callback(() => cancellationTokenSource.Token.ThrowIfCancellationRequested())
@@ -233,7 +233,7 @@ public class CreateEmployeeCommandHandlerTests
         _employeeRepoMock.Setup(r => r.IsPhoneNumberExistAsync(employee.PhoneNumber, 0, It.IsAny<CancellationToken>())).ReturnsAsync(false);
         _personServiceMock.Setup(s => s.GenerateUserName(employee.FirstName, employee.LastName)).Returns("mohammad.al-sabah");
         _personServiceMock.Setup(s => s.GeneratePassword()).Returns("TempPass123!");
-        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>())).ReturnsAsync(Microsoft.AspNetCore.Identity.IdentityResult.Success);
+        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Microsoft.AspNetCore.Identity.IdentityResult.Success);
         _userRepoMock.Setup(r => r.GetByUsernameAsync("mohammad.al-sabah", It.IsAny<CancellationToken>())).ReturnsAsync(appUser);
         _employeeRepoMock.Setup(r => r.AddAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
@@ -260,7 +260,7 @@ public class CreateEmployeeCommandHandlerTests
         _employeeRepoMock.Setup(r => r.IsPhoneNumberExistAsync(employee.PhoneNumber, 0, It.IsAny<CancellationToken>())).ReturnsAsync(false);
         _personServiceMock.Setup(s => s.GenerateUserName(employee.FirstName, employee.LastName)).Returns("mohammad.al-sabah");
         _personServiceMock.Setup(s => s.GeneratePassword()).Returns("TempPass123!");
-        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>())).ReturnsAsync(Microsoft.AspNetCore.Identity.IdentityResult.Success);
+        _userRepoMock.Setup(r => r.Register(It.IsAny<AppUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Microsoft.AspNetCore.Identity.IdentityResult.Success);
         _userRepoMock.Setup(r => r.GetByUsernameAsync("mohammad.al-sabah", It.IsAny<CancellationToken>())).ReturnsAsync(appUser);
         _employeeRepoMock.Setup(r => r.AddAsync(It.IsAny<Employee>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 

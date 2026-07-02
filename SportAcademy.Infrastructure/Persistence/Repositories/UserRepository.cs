@@ -27,13 +27,13 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
             return roles.ToList();
         }
 
-        public async Task<IdentityResult> Register(AppUser user, string password)
+        public async Task<IdentityResult> Register(AppUser user, string password, string role = "Trainee")
         {
             var registerResult = await _userManager.CreateAsync(user, password);
             if (!registerResult.Succeeded)
                 return registerResult;
 
-            var assignToRoleResult = await _userManager.AddToRoleAsync(user, "User");
+            var assignToRoleResult = await _userManager.AddToRoleAsync(user, role);
             return assignToRoleResult;
         }
 

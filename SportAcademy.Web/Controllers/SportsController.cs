@@ -16,7 +16,7 @@ using SportAcademy.Application.Queries.SportQueries.SearchSportsName;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
     [ApiController]
     public class SportsController : ControllerBase

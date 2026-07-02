@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SportAcademy.Domain.Entities;
+using SportAcademy.Domain.Enums;
+using SportAcademy.Infrastructure.Persistence.DBContext;
 
 namespace SportAcademy.Web
 {
@@ -8,6 +11,9 @@ namespace SportAcademy.Web
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AspUsersSeeder> _logger;
+
+        private const string AdminEmail = "admin@sportacademy.com";
+        private const string AdminPassword = "Admin@123";
 
         public AspUsersSeeder(
             UserManager<AppUser> userManager,
@@ -24,7 +30,7 @@ namespace SportAcademy.Web
             try
             {
                 _logger.LogInformation("Starting role seeding process...");
-                var roles = new[] { "Admin", "User", "Manager" };
+                var roles = new[] { "Admin", "Manager", "Trainee", "Coach" };
                 foreach (var role in roles)
                 {
                     if (!await _roleManager.RoleExistsAsync(role))
@@ -49,6 +55,118 @@ namespace SportAcademy.Web
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred during role seeding");
+                throw;
+            }
+        }
+
+        public async Task SeedAdminAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Starting admin seeding...");
+
+                if (await _userManager.FindByEmailAsync(AdminEmail) != null)
+                {
+                    _logger.LogInformation("Admin user already exists.");
+                    return;
+                }
+
+                var adminUser = new AppUser
+                {
+                    UserName = AdminEmail,
+                    Email = AdminEmail,
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    TwoFactorEnabled = false,
+                    LockoutEnabled = false,
+                    AccessFailedCount = 0,
+                    IsBanned = false
+                };
+
+                var result = await _userManager.CreateAsync(adminUser, AdminPassword);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(adminUser, "Admin");
+                    _logger.LogInformation("Successfully created admin user: {Email}", AdminEmail);
+                }
+                else
+                {
+                    _logger.LogError("Failed to create admin user. Errors: {Errors}",
+                        string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during admin seeding");
+                throw;
+            }
+        }
+
+        public async Task AssignRolesAsync(ApplicationDbContext context)
+        {
+            try
+            {
+                _logger.LogInformation("Starting role assignment for all users...");
+
+                var coachUserIds = await context.Employees
+                    .Where(e => e.AppUserId != null && e.Position == Position.Coach)
+                    .Select(e => e.AppUserId!)
+                    .ToListAsync();
+
+                var managerUserIds = await context.Employees
+                    .Where(e => e.AppUserId != null && e.Position != Position.Coach)
+                    .Select(e => e.AppUserId!)
+                    .ToListAsync();
+
+                var traineeUserIds = await context.Trainees
+                    .Where(t => t.AppUserId != null)
+                    .Select(t => t.AppUserId!)
+                    .ToListAsync();
+
+                var coachSet = coachUserIds.ToHashSet();
+                var managerSet = managerUserIds.ToHashSet();
+                var traineeSet = traineeUserIds.ToHashSet();
+
+                var users = _userManager.Users.ToList();
+
+                if (users.Count == 0)
+                {
+                    _logger.LogInformation("No users found to assign roles.");
+                    return;
+                }
+
+                foreach (var user in users)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Count > 0)
+                    {
+                        _logger.LogDebug("User {Email} already has roles: {Roles}", user.Email, string.Join(", ", roles));
+                        continue;
+                    }
+
+                    if (coachSet.Contains(user.Id))
+                    {
+                        await _userManager.AddToRoleAsync(user, "Coach");
+                        _logger.LogInformation("Assigned Coach role to {Email}", user.Email);
+                    }
+                    else if (managerSet.Contains(user.Id))
+                    {
+                        await _userManager.AddToRoleAsync(user, "Manager");
+                        _logger.LogInformation("Assigned Manager role to {Email}", user.Email);
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "Trainee");
+                        _logger.LogInformation("Assigned Trainee role to {Email}", user.Email);
+                    }
+                }
+
+                _logger.LogInformation("Role assignment completed for all users.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during role assignment");
                 throw;
             }
         }
@@ -216,11 +334,20 @@ namespace SportAcademy.Web
             using var scope = serviceProvider.CreateScope();
             var seeder = scope.ServiceProvider.GetRequiredService<AspUsersSeeder>();
 
+            await seeder.AddRulesAsync();
+            await seeder.SeedAdminAsync();
             // Use either method based on your preference
             await seeder.SeedUsersAsync(); // Simple seeding
                                            // OR
                                            // await seeder.SeedUsersWithRealisticDataAsync(); // More realistic data
-            await seeder.AddRulesAsync();
+        }
+
+        public static async Task AssignRoles(IServiceProvider serviceProvider, ApplicationDbContext context)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var seeder = scope.ServiceProvider.GetRequiredService<AspUsersSeeder>();
+
+            await seeder.AssignRolesAsync(context);
         }
     }
 }

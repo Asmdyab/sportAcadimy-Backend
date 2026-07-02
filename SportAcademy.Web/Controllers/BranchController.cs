@@ -20,7 +20,7 @@ using SportAcademy.Application.Queries.BranchQueries.SearchBranch;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
 	[ApiController]
 	public class BranchController : ControllerBase

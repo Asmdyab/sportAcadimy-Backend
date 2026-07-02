@@ -21,7 +21,7 @@ using SportAcademy.Application.Queries.SessionOccurrenceQueries.SearchSessionOcc
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager")]
     [Route("api/[controller]")]
     [ApiController]
     public class SessionOccurrenceController : ControllerBase

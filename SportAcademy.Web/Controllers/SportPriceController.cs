@@ -10,7 +10,7 @@ using SportAcademy.Application.Queries.SportPriceQueries.GetById;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
 	[ApiController]
 	public class SportPriceController : ControllerBase

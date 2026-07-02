@@ -287,6 +287,8 @@ using (var scope = app.Services.CreateScope())
     await DatabaseInitializer.SeedDatabase(scope.ServiceProvider);
 
     await DatabaseSeeder.SeedDatabase(dbContext, logger);
+
+    await DatabaseInitializer.AssignRoles(scope.ServiceProvider, dbContext);
 }
 
 app.UseHttpsRedirection();

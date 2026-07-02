@@ -21,7 +21,7 @@ using SportAcademy.Application.Queries.EnrollmentQueries.SearchEnrollment;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
     [ApiController]
     public class EnrollmentController : ControllerBase

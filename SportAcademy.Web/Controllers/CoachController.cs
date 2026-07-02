@@ -14,7 +14,7 @@ using SportAcademy.Application.Queries.CoachQueries.SearchCoachs;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager")]
     [ApiController]
     [Route("api/[controller]")]
     public class CoachController : ControllerBase

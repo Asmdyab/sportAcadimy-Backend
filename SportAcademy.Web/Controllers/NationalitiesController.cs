@@ -1,9 +1,11 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportAcademy.Application.Queries.NationalityQueries.GetNationalities;
 
 namespace SportAcademy.Web.Controllers;
 
+[Authorize(Roles = "Admin,Coach,Manager,Trainee")]
 [Route("api/[controller]")]
 [ApiController]
 public class NationalitiesController : ControllerBase

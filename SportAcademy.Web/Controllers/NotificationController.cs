@@ -9,7 +9,7 @@ using SportAcademy.Application.Queries.NotificationQueries.GetUserNotifications;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationsController : ControllerBase

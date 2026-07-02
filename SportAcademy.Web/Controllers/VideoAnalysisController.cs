@@ -7,7 +7,7 @@ using SportAcademy.Application.Queries.VideoAnalysisQueries.GetUserAnalyses;
 
 namespace SportAcademy.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Coach,Manager")]
 [ApiController]
 [Route("api/[controller]")]
 public class VideoAnalysisController : ControllerBase

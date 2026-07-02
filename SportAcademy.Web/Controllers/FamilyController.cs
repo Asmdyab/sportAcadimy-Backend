@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportAcademy.Application.Common.Pagination;
 using SportAcademy.Application.Queries.FamilyQueries.GetAllFamilies;
@@ -6,6 +7,7 @@ using SportAcademy.Application.Queries.FamilyQueries.SearchFamily;
 
 namespace SportAcademy.Web.Controllers
 {
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
     [ApiController]
     public class FamilyController : ControllerBase

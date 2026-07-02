@@ -10,7 +10,7 @@ using SportAcademy.Application.Queries.SportTraineeQueries.GetById;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager")]
     [Route("api/[controller]")]
 	[ApiController]
 	public class SportTraineeController : ControllerBase

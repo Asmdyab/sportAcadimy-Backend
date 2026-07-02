@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [ApiController]
     [Route("api/[controller]")]
     public class TraineeController : ControllerBase

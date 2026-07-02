@@ -19,7 +19,7 @@ using SportAcademy.Application.Queries.EmployeeQueries.SearchEmployeess;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Manager")]
     [ApiController]
     [Route("api/[controller]")]
     public class EmployeeController : ControllerBase

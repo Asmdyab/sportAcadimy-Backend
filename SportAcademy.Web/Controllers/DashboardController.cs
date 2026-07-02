@@ -6,7 +6,7 @@ using SportAcademy.Application.Queries.DashboardQueries.GetDashboardStats;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
     [ApiController]
     public class DashboardController : ControllerBase

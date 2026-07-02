@@ -18,7 +18,7 @@ using SportAcademy.Domain.Enums;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager")]
     [Route("api/[controller]")]
     [ApiController]
     public class AttendanceController : ControllerBase

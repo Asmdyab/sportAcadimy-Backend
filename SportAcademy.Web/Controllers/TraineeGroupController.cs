@@ -14,7 +14,7 @@ using SportAcademy.Application.Queries.TraineeGroupQueries.SearchTraineeGroup;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Coach,Manager")]
     [Route("api/[controller]")]
     [ApiController]
     public class TraineeGroupController : ControllerBase
