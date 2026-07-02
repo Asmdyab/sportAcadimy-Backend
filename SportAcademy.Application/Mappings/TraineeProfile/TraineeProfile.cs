@@ -23,18 +23,21 @@ namespace SportAcademy.Application.Mappings.TraineeProfile
                     src.FirstName,
                     src.LastName,
                     GetAge(src),
-                    src.Email.ToString(),
+                    src.Email != null ? src.Email.ToString() : string.Empty,
                     src.PhoneNumber,
                     src.JoinDate.ToDateTime(TimeOnly.MinValue),
                     src.IsSubscribed,
-                    src.Sports.Select(st => new TraineeSportSkillDto
-                    {
-                        SkillLevel = st.SkillLevel,
-                        SportName = st.Sport.Name
-                    }).ToList(),
-                    src.Enrollments.FirstOrDefault()!.TraineeGroup.Coach.Employee.FirstName +
-                        " " + src.Enrollments.FirstOrDefault()!.TraineeGroup.Coach.Employee.LastName,
-                    src.Branch.Name ?? string.Empty
+                    src.Sports != null
+                        ? src.Sports.Select(st => new TraineeSportSkillDto
+                        {
+                            SkillLevel = st.SkillLevel,
+                            SportName = st.Sport != null ? st.Sport.Name : string.Empty
+                        }).ToList()
+                        : new List<TraineeSportSkillDto>(),
+                    src.Enrollments != null && src.Enrollments.Any()
+                        ? GetCoachName(src.Enrollments.First().TraineeGroup)
+                        : null,
+                    src.Branch != null ? src.Branch.Name : string.Empty
                 ))
                 .ReverseMap();
 
@@ -43,16 +46,19 @@ namespace SportAcademy.Application.Mappings.TraineeProfile
                     src.Id,
                     src.FirstName,
                     src.LastName,
-                    src.Email.ToString(),
+                    src.Email != null ? src.Email.ToString() : string.Empty,
                     src.PhoneNumber,
                     src.ParentNumber,
                     src.GuardianName,
-                    src.Branch.Name ?? string.Empty,
+                    src.Branch != null ? src.Branch.Name : string.Empty,
                     src.BirthDate,
                     src.Gender.ToString(),
-                    src.Sports.Select(s => s.Sport.Name).ToList(),
+                    src.Sports != null
+                        ? src.Sports.Select(s => s.Sport != null ? s.Sport.Name : string.Empty)
+                            .Where(n => !string.IsNullOrEmpty(n)).ToList()
+                        : new List<string>(),
                     src.IsSubscribed,
-                    src.Enrollments.Count,
+                    src.Enrollments != null ? src.Enrollments.Count : 0,
                     src.JoinDate.ToDateTime(TimeOnly.MinValue)
                 ));
 
@@ -91,6 +97,13 @@ namespace SportAcademy.Application.Mappings.TraineeProfile
                 {
                     SportId = s.Id
                 }).ToList()));
+        }
+
+        private static string? GetCoachName(TraineeGroup? traineeGroup)
+        {
+            if (traineeGroup?.Coach?.Employee == null)
+                return null;
+            return $"{traineeGroup.Coach.Employee.FirstName} {traineeGroup.Coach.Employee.LastName}";
         }
 
         private static int GetAge(Trainee trainee)

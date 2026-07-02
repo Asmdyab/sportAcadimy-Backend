@@ -137,9 +137,50 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
             return result == 1;
         }
 
+        public async Task<PagedData<TraineeCardDto>> GetFilteredPaginatedAsync(
+            PageRequest page, bool? isSubscribed, string? sport, CancellationToken ct = default)
+        {
+            var query = _context.Trainees
+                .AsNoTracking()
+                .Where(t => !t.IsDeleted);
+
+            if (isSubscribed.HasValue)
+                query = query.Where(t => t.IsSubscribed == isSubscribed.Value);
+
+            if (!string.IsNullOrWhiteSpace(sport))
+                query = query.Where(t => t.Sports.Any(st => st.Sport.Name == sport));
+
+            var totalCount = await query.CountAsync(ct);
+
+            var items = await query
+                .OrderBy(t => t.Id)
+                .Skip(page.Skip)
+                .Take(page.PageSize)
+                .Include(t => t.Sports)
+                    .ThenInclude(st => st.Sport)
+                .Include(t => t.Enrollments)
+                    .ThenInclude(e => e.TraineeGroup)
+                    .ThenInclude(tg => tg.Coach)
+                    .ThenInclude(c => c.Employee)
+                .Include(t => t.Branch)
+                .ToListAsync(ct);
+
+            var dtos = _mapper.Map<List<TraineeCardDto>>(items);
+
+            return new PagedData<TraineeCardDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                Page = page.Page,
+                PageSize = page.PageSize
+            };
+        }
+
         public async Task<PagedData<TraineeCardDto>> SearchAsync(
             string term,
             PageRequest pageReq,
+            bool? isSubscribed,
+            string? sport,
             CancellationToken cancellationToken)
         {
             var offset = (pageReq.Page - 1) * pageReq.PageSize;
@@ -193,6 +234,12 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                     LEFT JOIN Employees ce ON ce.Id = c.EmployeeId
                     LEFT JOIN Branches b ON tg.BranchId = b.Id
                     WHERE t.IsDeleted = 0
+                      AND (@isSubscribed IS NULL OR t.IsSubscribed = @isSubscribed)
+                      AND (@sport IS NULL OR EXISTS (
+                          SELECT 1 FROM SportTrainees st2
+                          INNER JOIN Sports s2 ON st2.SportId = s2.Id
+                          WHERE st2.TraineeId = t.Id AND s2.Name = @sport
+                      ))
                     GROUP BY
                         t.Id, t.FirstName, t.LastName, t.BirthDate, t.Email,
                         t.PhoneNumber, t.JoinDate, t.IsSubscribed,
@@ -200,7 +247,7 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                     ORDER BY ft.RANK DESC, t.Id ASC
                     OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
                 ";
-                parameters = new { term = fullTextTerm, offset, pageReq.PageSize };
+                parameters = new { term = fullTextTerm, isSubscribed, sport, offset, pageReq.PageSize };
             }
             else
             {
@@ -234,6 +281,12 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                     LEFT JOIN Employees ce ON ce.Id = c.EmployeeId
                     LEFT JOIN Branches b ON tg.BranchId = b.Id
                     WHERE t.IsDeleted = 0
+                      AND (@isSubscribed IS NULL OR t.IsSubscribed = @isSubscribed)
+                      AND (@sport IS NULL OR EXISTS (
+                          SELECT 1 FROM SportTrainees st2
+                          INNER JOIN Sports s2 ON st2.SportId = s2.Id
+                          WHERE st2.TraineeId = t.Id AND s2.Name = @sport
+                      ))
                       AND (t.FirstName LIKE @likeTerm
                            OR t.LastName LIKE @likeTerm
                            OR t.Email LIKE @likeTerm)
@@ -244,7 +297,7 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                     ORDER BY t.Id ASC
                     OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
                 ";
-                parameters = new { likeTerm, offset, pageReq.PageSize };
+                parameters = new { likeTerm, isSubscribed, sport, offset, pageReq.PageSize };
             }
 
             var rows = await connection.QueryAsync<TraineeCardRow>(sql, parameters);

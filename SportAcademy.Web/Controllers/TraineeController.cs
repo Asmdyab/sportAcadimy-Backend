@@ -36,10 +36,18 @@ namespace SportAcademy.Web.Controllers
         public async Task<ActionResult> Index(
             [FromQuery] int? page,
             [FromQuery] int? pageSize,
+            [FromQuery] string? status,
+            [FromQuery] string? sport,
             CancellationToken ct)
         {
+            bool? isSubscribed = status?.ToLower() switch
+            {
+                "active" => true,
+                "inactive" => false,
+                _ => null
+            };
             var trainees = await _mediator.Send(new GetAllTraineesQuery(
-                        PageRequest.Create(page, pageSize)), ct);
+                        PageRequest.Create(page, pageSize), isSubscribed, sport), ct);
             return Ok(trainees);
         }
 
@@ -112,10 +120,18 @@ namespace SportAcademy.Web.Controllers
             [FromQuery] string searchTerm,
             [FromQuery] int? page,
             [FromQuery] int? pageSize,
+            [FromQuery] string? status,
+            [FromQuery] string? sport,
             CancellationToken cancellationToken)
         {
+            bool? isSubscribed = status?.ToLower() switch
+            {
+                "active" => true,
+                "inactive" => false,
+                _ => null
+            };
             var pageRequest = PageRequest.Create(page, pageSize);
-            var result = await _mediator.Send(new SearchTraineeQuery(searchTerm, pageRequest), 
+            var result = await _mediator.Send(new SearchTraineeQuery(searchTerm, pageRequest, isSubscribed, sport), 
                 cancellationToken);
 
             return Ok(result);

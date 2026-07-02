@@ -96,6 +96,7 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                             AND enr.IsDeleted = 0
                         GROUP BY tg.CoachId
                     ) trainee_count ON c.EmployeeId = trainee_count.CoachId
+                    WHERE c.IsDeleted = 0
                     ORDER BY ft.RANK DESC, c.EmployeeId ASC
                     OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
 
@@ -106,7 +107,8 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                         Employees,
                         (FirstName, LastName),
                         @term
-                    ) ft ON e.Id = ft.[KEY];
+                    ) ft ON e.Id = ft.[KEY]
+                    WHERE c.IsDeleted = 0;
                 ";
                 parameters = new { term = fullTextTerm, offset, pageReq.PageSize };
             }
@@ -141,14 +143,14 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                             AND enr.IsDeleted = 0
                         GROUP BY tg.CoachId
                     ) trainee_count ON c.EmployeeId = trainee_count.CoachId
-                    WHERE (e.FirstName LIKE @likeTerm OR e.LastName LIKE @likeTerm)
+                    WHERE c.IsDeleted = 0 AND (e.FirstName LIKE @likeTerm OR e.LastName LIKE @likeTerm)
                     ORDER BY c.EmployeeId ASC
                     OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
 
                     SELECT COUNT(*)
                     FROM Coaches c
                     INNER JOIN Employees e ON c.EmployeeId = e.Id
-                    WHERE (e.FirstName LIKE @likeTerm OR e.LastName LIKE @likeTerm);
+                    WHERE c.IsDeleted = 0 AND (e.FirstName LIKE @likeTerm OR e.LastName LIKE @likeTerm);
                 ";
                 parameters = new { likeTerm, offset, pageReq.PageSize };
             }
@@ -182,6 +184,14 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                     BranchName = c.Employee.Branch.Name
                 })
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<Coach?> GetByIdIncludeDeletedAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _context.Coachs
+                .IgnoreQueryFilters()
+                .Where(c => c.EmployeeId == id)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<Coach?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default)

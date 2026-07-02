@@ -36,6 +36,8 @@ namespace SportAcademy.Application.Commands.EmployeeCommands.CreateEmployee
             var employee = _mapper.Map<Employee>(request)
                 ?? throw new AutoMapperMappingException("Error occurred while mapping.");
 
+            employee.HireDate = DateTime.UtcNow;
+
             var isSSNValid = _employeeService.IsSSNValid(employee.SSN, employee.BirthDate);
 
             if (!isSSNValid)

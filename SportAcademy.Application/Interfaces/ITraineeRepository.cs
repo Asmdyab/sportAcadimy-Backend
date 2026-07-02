@@ -17,7 +17,8 @@ namespace SportAcademy.Application.Interfaces
         Task<int> GetTraineesCountOfSpecificDayAsync(DateTime date, CancellationToken cancellationToken = default);
         Task<int> CountAsync(CancellationToken cancellationToken = default);
         Task<int> GetActiveTraineesCount(CancellationToken cancellationToken = default);
-        Task<PagedData<TraineeCardDto>> SearchAsync(string term, PageRequest page, CancellationToken ct = default);
+        Task<PagedData<TraineeCardDto>> GetFilteredPaginatedAsync(PageRequest page, bool? isSubscribed, string? sport, CancellationToken ct = default);
+        Task<PagedData<TraineeCardDto>> SearchAsync(string term, PageRequest page, bool? isSubscribed, string? sport, CancellationToken ct = default);
         Task<PagedData<TraineeCardDto>> SearchByIdAsync(int id, PageRequest page, CancellationToken ct = default);
         Task<List<TraineeDropdownDto>> GetDropdownAsync(CancellationToken cancellationToken = default);
         Task<TraineeCode> GenerateTraineeCodeAsync(int familyId, int branchId, int nationalityCategoryId, AgeCategory ageCategory, CancellationToken cancellationToken = default);

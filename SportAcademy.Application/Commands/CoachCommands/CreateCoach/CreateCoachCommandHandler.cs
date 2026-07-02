@@ -1,13 +1,9 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using SportAcademy.Application.Common.Result;
 using SportAcademy.Application.Interfaces;
-using SportAcademy.Domain.Contract;
 using SportAcademy.Domain.Entities;
 using SportAcademy.Domain.Enums;
-using SportAcademy.Domain.Exceptions.BaseExceptions;
 using SportAcademy.Domain.Exceptions.EmployeeExceptions;
-using SportAcademy.Domain.Exceptions.SharedExceptions;
 
 namespace SportAcademy.Application.Commands.CoachCommands.CreateCoach
 {
@@ -19,9 +15,7 @@ namespace SportAcademy.Application.Commands.CoachCommands.CreateCoach
 
         public CreateCoachCommandHandler(
             IEmployeeRepository employeeRepository,
-            ICoachRepository coachRepository,
-            IPersonService personService,
-            IMapper mapper)
+            ICoachRepository coachRepository)
         {
             _employeeRepository = employeeRepository;
             _coachRepository = coachRepository;
@@ -34,11 +28,26 @@ namespace SportAcademy.Application.Commands.CoachCommands.CreateCoach
 
             ct.ThrowIfCancellationRequested();
 
+            var existingCoach = await _coachRepository.GetByIdIncludeDeletedAsync(request.EmployeeId, ct);
+
+            if (existingCoach != null)
+            {
+                existingCoach.IsDeleted = false;
+                existingCoach.DeletedAt = null;
+                existingCoach.DeletedBy = null;
+                existingCoach.SportId = request.SportId;
+                existingCoach.SkillLevel = ParseSkillLevel(request.SkillLevel);
+
+                await _coachRepository.UpdateAsync(existingCoach, ct);
+
+                return Result<int>.Success(employee.Id, _operationType);
+            }
+
             var coach = new Coach
             {
                 EmployeeId = request.EmployeeId,
                 SportId = request.SportId,
-                SkillLevel = request.SkillLevel
+                SkillLevel = ParseSkillLevel(request.SkillLevel)
             };
 
             ct.ThrowIfCancellationRequested();
@@ -46,6 +55,14 @@ namespace SportAcademy.Application.Commands.CoachCommands.CreateCoach
             await _coachRepository.AddAsync(coach, ct);
 
             return Result<int>.Success(employee.Id, _operationType);
+        }
+
+        private static SkillLevel ParseSkillLevel(string value)
+        {
+            if (value.Equals("Professional", StringComparison.OrdinalIgnoreCase))
+                return SkillLevel.Expert;
+
+            return Enum.Parse<SkillLevel>(value, ignoreCase: true);
         }
     }
 }

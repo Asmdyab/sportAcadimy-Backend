@@ -10,7 +10,6 @@ namespace SportAcademy.Tests.Application.Handlers;
 
 public class GetAllTraineesQueryHandlerTests
 {
-    private readonly Mock<IMapper> _mapperMock = new();
     private readonly Mock<IAttendanceRepository> _attendanceRepoMock = new();
     private readonly Mock<ITraineeRepository> _traineeRepoMock = new();
     private readonly GetAllTraineesQueryHandler _handler;
@@ -28,7 +27,7 @@ public class GetAllTraineesQueryHandlerTests
     {
         var page = PageRequest.Create(1, 10);
         var query = new GetAllTraineesQuery(page);
-        var pagedData = new PagedData<TraineeDto>
+        var pagedData = new PagedData<TraineeCardDto>
         {
             Items = [],
             TotalCount = 0,
@@ -37,7 +36,7 @@ public class GetAllTraineesQueryHandlerTests
         };
 
         _traineeRepoMock
-            .Setup(r => r.GetAllPaginatedAsync<TraineeDto>(page, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetFilteredPaginatedAsync(page, null, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pagedData);
 
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -53,7 +52,7 @@ public class GetAllTraineesQueryHandlerTests
     {
         var page = PageRequest.Create(2, 25);
         var query = new GetAllTraineesQuery(page);
-        var pagedData = new PagedData<TraineeDto>
+        var pagedData = new PagedData<TraineeCardDto>
         {
             Items = [],
             TotalCount = 50,
@@ -62,13 +61,13 @@ public class GetAllTraineesQueryHandlerTests
         };
 
         _traineeRepoMock
-            .Setup(r => r.GetAllPaginatedAsync<TraineeDto>(page, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetFilteredPaginatedAsync(page, null, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(pagedData);
 
         var result = await _handler.Handle(query, CancellationToken.None);
 
         _traineeRepoMock.Verify(
-            r => r.GetAllPaginatedAsync<TraineeDto>(page, It.IsAny<CancellationToken>()),
+            r => r.GetFilteredPaginatedAsync(page, null, null, It.IsAny<CancellationToken>()),
             Times.Once);
         result.Data!.Page.Should().Be(2);
         result.Data.PageSize.Should().Be(25);

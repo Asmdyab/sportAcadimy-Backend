@@ -8,7 +8,9 @@ namespace SportAcademy.Application.Queries.TraineeQueries.SearchTrainee;
 
 public record SearchTraineeQuery(
     string Term,
-    PageRequest Page
+    PageRequest Page,
+    bool? IsSubscribed = null,
+    string? Sport = null
 ) : IRequest<Result<PagedData<TraineeCardDto>>>,
     IPaginatedRequest,
     ISearchRequest

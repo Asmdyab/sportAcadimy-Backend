@@ -1,7 +1,7 @@
-﻿using SportAcademy.Application.Commands.CoachCommands.CreateCoach;
-using SportAcademy.Application.Commands.CoachCommands.CreateCoachWithEmployee;
+﻿using SportAcademy.Application.Commands.CoachCommands.CreateCoachWithEmployee;
 using SportAcademy.Application.DTOs.CoachDtos;
 using SportAcademy.Domain.Entities;
+using SportAcademy.Domain.Enums;
 
 namespace SportAcademy.Application.Mappings.CoachProfile
 {
@@ -29,13 +29,16 @@ namespace SportAcademy.Application.Mappings.CoachProfile
                 ))
                 .ReverseMap();
 
-            CreateMap<CreateCoachCommand, Coach>();
-
             CreateMap<CreateCoachWithEmployeeCommand, Coach>()
                 .ForMember(
                     dest => dest.Employee,
-                    opt => opt.Ignore()
-                );
+                    opt => opt.Ignore())
+                .ForMember(
+                    dest => dest.SkillLevel,
+                    opt => opt.MapFrom(src =>
+                        src.SkillLevel.Equals("Professional", StringComparison.OrdinalIgnoreCase)
+                            ? SkillLevel.Expert
+                            : (SkillLevel)Enum.Parse(typeof(SkillLevel), src.SkillLevel, true)));
 
             CreateMap<Coach, CoachSummaryDto>().ReverseMap();
 

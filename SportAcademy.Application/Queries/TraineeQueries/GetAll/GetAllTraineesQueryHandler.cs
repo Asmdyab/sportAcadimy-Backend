@@ -30,8 +30,8 @@ namespace SportAcademy.Application.Queries.TraineeQueries.GetAll
 
         public async Task<Result<PagedData<TraineeCardDto>>> Handle(GetAllTraineesQuery request, CancellationToken cancellationToken)
         {
-            var traineesDto = await _traineeRepository.GetAllPaginatedAsync<TraineeCardDto>(request.Page,
-                cancellationToken);
+            var traineesDto = await _traineeRepository.GetFilteredPaginatedAsync(request.Page,
+                request.IsSubscribed, request.Sport, cancellationToken);
 
             foreach (var trainee in traineesDto.Items)
             {

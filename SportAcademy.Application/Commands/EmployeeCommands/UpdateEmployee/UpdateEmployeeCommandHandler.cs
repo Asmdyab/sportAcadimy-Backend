@@ -3,9 +3,11 @@ using MediatR;
 using SportAcademy.Application.Common.Result;
 using SportAcademy.Application.DTOs.EmployeeDtos;
 using SportAcademy.Application.Interfaces;
+using SportAcademy.Domain.Entities;
 using SportAcademy.Domain.Enums;
 using SportAcademy.Domain.Exceptions.EmployeeExceptions;
 using SportAcademy.Domain.Exceptions.SharedExceptions;
+using SportAcademy.Domain.ValueObjects;
 
 namespace SportAcademy.Application.Commands.EmployeeCommands.UpdateEmployee
 {
@@ -28,12 +30,15 @@ namespace SportAcademy.Application.Commands.EmployeeCommands.UpdateEmployee
             var employee = await _employeeRepository.GetByIdAsync(request.Id, cancellationToken)
                 ?? throw new EmployeeNotFoundException($"{request.Id}");
 
-            var isPhoneNumberExist = await _employeeRepository
-                .IsPhoneNumberExistAsync(employee.PhoneNumber, employee.Id, cancellationToken);
-            if (isPhoneNumberExist)
-                throw new PhoneNumberNotUniqueException();
+            if (request.PhoneNumber != null && request.PhoneNumber != employee.PhoneNumber)
+            {
+                var isPhoneNumberExist = await _employeeRepository
+                    .IsPhoneNumberExistAsync(request.PhoneNumber, employee.Id, cancellationToken);
+                if (isPhoneNumberExist)
+                    throw new PhoneNumberNotUniqueException();
+            }
 
-            _mapper.Map(request, employee);
+            ApplyUpdates(employee, request);
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -45,6 +50,38 @@ namespace SportAcademy.Application.Commands.EmployeeCommands.UpdateEmployee
                 ?? throw new AutoMapperMappingException("Error occurred while mapping.");
 
             return Result<EmployeeDto>.Success(employeeDto, _operationType);
+        }
+
+        private static void ApplyUpdates(Employee employee, UpdateEmployeeCommand request)
+        {
+            if (request.PhoneNumber != null)
+                employee.PhoneNumber = request.PhoneNumber;
+
+            if (request.SecondPhoneNumber != null)
+                employee.SecondPhoneNumber = request.SecondPhoneNumber;
+
+            if (request.Position != null)
+                employee.Position = Enum.Parse<Position>(request.Position, ignoreCase: true);
+
+            if (request.Salary.HasValue)
+                employee.Salary = request.Salary.Value;
+
+            if (request.BranchId.HasValue)
+                employee.BranchId = request.BranchId.Value;
+
+            if (request.Nationality != null)
+                employee.Nationality = Enum.Parse<Nationality>(request.Nationality, ignoreCase: true);
+
+            UpdateAddress(employee, request);
+        }
+
+        private static void UpdateAddress(Employee employee, UpdateEmployeeCommand request)
+        {
+            var newStreet = request.Street ?? employee.Address?.Street;
+            var newCity = request.City ?? employee.Address?.City;
+
+            if (request.Street != null || request.City != null)
+                employee.Address = Address.Create(newStreet!, newCity!);
         }
     }
 }

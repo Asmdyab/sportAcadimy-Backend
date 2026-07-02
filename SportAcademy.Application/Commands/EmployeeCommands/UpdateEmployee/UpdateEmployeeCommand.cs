@@ -1,24 +1,18 @@
 ﻿using MediatR;
 using SportAcademy.Application.Common.Result;
 using SportAcademy.Application.DTOs.EmployeeDtos;
-using SportAcademy.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SportAcademy.Application.Commands.EmployeeCommands.UpdateEmployee
 {
     public record UpdateEmployeeCommand(
         int Id,
-        string FirstName,
-        string LastName,
-        decimal Salary,
-        string Street,
-        string City,
-        string PhoneNumber,
-        string? SecondPhoneNumber,
-        Position Position,
-        int BranchId) : IRequest<Result<EmployeeDto>>;
+        string? PhoneNumber = null,
+        string? SecondPhoneNumber = null,
+        string? Position = null,
+        decimal? Salary = null,
+        int? BranchId = null,
+        string? Street = null,
+        string? City = null,
+        string? Nationality = null
+    ) : IRequest<Result<EmployeeDto>>;
 }
