@@ -34,6 +34,10 @@ namespace SportAcademy.Application.Common.Result
         private Result(bool isSuccess, string operationType, string message)
         : base(isSuccess, operationType, message) { }
 
+        public static Result Success(string operation,
+            string message = "{Operation} operation done successfully")
+            => new(true, operation, message.Replace("{Operation}", operation));
+
         public static Result Failure(string operation, string message, int statusCode = 500)
         => new(false, operation, message)
         {

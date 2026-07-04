@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportAcademy.Application.Commands.ChatCommands.AddMessage;
 using SportAcademy.Application.Commands.ChatCommands.CreateConversation;
+using SportAcademy.Application.Commands.ChatCommands.DeleteConversation;
 using SportAcademy.Application.Commands.ChatCommands.SendMessageToBot;
 using SportAcademy.Application.Queries.ChatQueries;
 using SportAcademy.Application.Queries.ChatQueries.GetAllConversations;
@@ -54,6 +55,13 @@ public class ChatController : ControllerBase
     public async Task<IActionResult> GetConversations(CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetAllConversationsQuery(), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpDelete("conversation/{conversationId:guid}")]
+    public async Task<IActionResult> DeleteConversation(Guid conversationId, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new DeleteConversationCommand(conversationId), cancellationToken);
         return Ok(result);
     }
 }
