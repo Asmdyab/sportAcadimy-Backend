@@ -12,6 +12,7 @@ namespace SportAcademy.Application.Commands.TraineeGroupCommands.UpdateTraineeGr
 {
     public record UpdateTraineeGroupCommand(
         int Id,
+        string? Name,
         SkillLevel SkillLevel,
         int? MaximumCapacity,
         int? DurationInMinutes,

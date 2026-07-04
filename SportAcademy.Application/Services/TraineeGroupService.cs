@@ -21,10 +21,10 @@ namespace SportAcademy.Application.Services
 
             var coach = await _coachRepository.GetByIdAsync(traineeGroup.CoachId);
 
-            string fullName = $"{coach?.Employee?.FirstName} {coach?.Employee?.LastName}".Trim();
             if (coach == null || coach.Sport == null)
                 return "Unknown Group";
 
+            string fullName = $"{coach.Employee?.FirstName} {coach.Employee?.LastName}".Trim();
             var sportName = coach.Sport.Name;
             var levelName = traineeGroup.SkillLevel;
             var coachName = GetInitials(fullName);

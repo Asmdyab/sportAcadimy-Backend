@@ -181,7 +181,8 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                     EmployeeFirstName = c.Employee.FirstName,
                     EmployeeLastName = c.Employee.LastName,
                     BranchId = c.Employee.BranchId,
-                    BranchName = c.Employee.Branch.Name
+                    BranchName = c.Employee.Branch.Name,
+                    SportName = c.Sport.Name
                 })
                 .ToListAsync(cancellationToken);
         }

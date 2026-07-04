@@ -7,5 +7,6 @@ namespace SportAcademy.Application.DTOs.CoachDtos
         public string EmployeeLastName { get; set; } = string.Empty;
         public int BranchId { get; set; }
         public string BranchName { get; set; } = string.Empty;
+        public string SportName { get; set; } = string.Empty;
     }
 }

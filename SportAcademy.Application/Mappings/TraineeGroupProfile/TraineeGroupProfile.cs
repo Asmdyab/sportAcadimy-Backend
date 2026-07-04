@@ -21,7 +21,7 @@ public class TraineeGroupMappingProfile : AutoMapper.Profile
             .ForMember(dest => dest.SportName,
                 opt => opt.MapFrom(src => src.Coach.Sport.Name))
             .ForMember(dest => dest.CoachName,
-                opt => opt.MapFrom(src => src.Coach.Employee.FirstName))
+                opt => opt.MapFrom(src => $"{src.Coach.Employee.FirstName} {src.Coach.Employee.LastName}"))
             .ForMember(dest => dest.BranchName,
                 opt => opt.MapFrom(src => src.Branch.Name))
             .ForMember(dest => dest.Schedules,
@@ -43,7 +43,7 @@ public class TraineeGroupMappingProfile : AutoMapper.Profile
             .ForMember(dest => dest.SportName,
                 opt => opt.MapFrom(src => src.Coach.Sport.Name))
             .ForMember(dest => dest.CoachName,
-                opt => opt.MapFrom(src => src.Coach.Employee.FirstName))
+                opt => opt.MapFrom(src => $"{src.Coach.Employee.FirstName} {src.Coach.Employee.LastName}"))
             .ForMember(dest => dest.BranchName,
                 opt => opt.MapFrom(src => src.Branch.Name))
             .ForMember(dest => dest.Schedules,
@@ -62,6 +62,7 @@ public class TraineeGroupMappingProfile : AutoMapper.Profile
         CreateMap<TraineeGroup, TraineeGroupDto>()
             .ConstructUsing(src => new TraineeGroupDto(
                 src.Id,
+                src.Name,
                 src.SkillLevel,
                 src.MaximumCapacity,
                 src.DurationInMinutes,
@@ -80,7 +81,7 @@ public class TraineeGroupMappingProfile : AutoMapper.Profile
             .ForMember(dest => dest.SportName,
                 opt => opt.MapFrom(src => src.Coach.Sport.Name))
             .ForMember(dest => dest.CoachName,
-                opt => opt.MapFrom(src => src.Coach.Employee.FirstName))
+                opt => opt.MapFrom(src => $"{src.Coach.Employee.FirstName} {src.Coach.Employee.LastName}"))
             .ForMember(dest => dest.BranchName,
                 opt => opt.MapFrom(src => src.Branch.Name))
             .ForMember(dest => dest.Schedules,
