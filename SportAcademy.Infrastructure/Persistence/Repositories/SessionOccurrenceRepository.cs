@@ -35,7 +35,7 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                     TotalEnrolled = s.GroupSchedule.TraineeGroup.Enrollments.Count(e => e.IsActive && !e.IsDeleted),
                     TotalPresent = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Present),
                     TotalAbsent = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Absent),
-                    TotalLate = 0,
+                    TotalLate = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Excused),
                     Date = s.StartDateTime.Date
                 });
 
@@ -76,7 +76,7 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                     TotalEnrolled = s.GroupSchedule.TraineeGroup.Enrollments.Count(e => e.IsActive && !e.IsDeleted),
                     TotalPresent = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Present),
                     TotalAbsent = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Absent),
-                    TotalLate = 0,
+                    TotalLate = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Excused),
                     Date = s.StartDateTime.Date
                 });
 
@@ -125,7 +125,7 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                             TotalEnrolled = tg.Enrollments.Count(e => e.IsActive && !e.IsDeleted),
                             TotalPresent = so.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Present),
                             TotalAbsent = so.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Absent),
-                            TotalLate = 0
+                            TotalLate = so.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Excused)
                         })
                         .ToList()
                 })
