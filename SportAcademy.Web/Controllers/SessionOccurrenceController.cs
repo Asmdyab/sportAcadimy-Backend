@@ -17,6 +17,7 @@ using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetById;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetCount;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetByDate;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetGroupsByDate;
+using SportAcademy.Application.Queries.SessionOccurrenceQueries.SearchGroups;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.SearchSessionOccurrence;
 
 namespace SportAcademy.Web.Controllers
@@ -108,6 +109,18 @@ namespace SportAcademy.Web.Controllers
         {
             var result = await _mediator.Send(
                 new GetSessionGroupsByDateQuery(date, PageRequest.Create(page, pageSize), traineeGroupId), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("groups-search")]
+        public async Task<IActionResult> SearchGroups(
+            [FromQuery] string? searchTerm,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize,
+            CancellationToken ct)
+        {
+            var result = await _mediator.Send(
+                new SearchSessionGroupsQuery(searchTerm ?? "", PageRequest.Create(page, pageSize)), ct);
             return Ok(result);
         }
 

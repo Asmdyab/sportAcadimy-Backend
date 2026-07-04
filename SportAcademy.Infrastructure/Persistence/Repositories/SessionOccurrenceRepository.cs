@@ -140,6 +140,66 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
             };
         }
 
+        public async Task<PagedData<SessionGroupCardDto>> SearchGroupsAsync(string term, PageRequest page, CancellationToken ct = default)
+        {
+            var todayStart = DateTime.Today;
+
+            var groupsQuery = _context.TraineeGroups
+                .AsNoTracking()
+                .Where(tg => tg.GroupSchedules
+                    .Any(gs => gs.SessionOccurrences
+                        .Any(so => so.StartDateTime >= todayStart)));
+
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                var t = term.ToLower();
+                groupsQuery = groupsQuery.Where(tg =>
+                    tg.Coach.Sport.Name.ToLower().Contains(t) ||
+                    (tg.Coach.Employee.FirstName + " " + tg.Coach.Employee.LastName).ToLower().Contains(t) ||
+                    tg.Branch.Name.ToLower().Contains(t));
+            }
+
+            var totalCount = await groupsQuery.CountAsync(ct);
+
+            var groups = await groupsQuery
+                .OrderBy(tg => tg.Name)
+                .Skip(page.Skip)
+                .Take(page.PageSize)
+                .Select(tg => new SessionGroupCardDto
+                {
+                    TraineeGroupId = tg.Id,
+                    TraineeGroupName = tg.Name,
+                    SportName = tg.Coach.Sport.Name,
+                    CoachName = tg.Coach.Employee.FirstName + " " + tg.Coach.Employee.LastName,
+                    BranchName = tg.Branch.Name,
+                    DurationInMinutes = tg.DurationInMinutes,
+                    Occurrences = tg.GroupSchedules
+                        .SelectMany(gs => gs.SessionOccurrences)
+                        .Where(so => so.StartDateTime >= todayStart)
+                        .Select(so => new SessionOccurrenceBriefDto
+                        {
+                            Id = so.Id,
+                            StartDateTime = so.StartDateTime,
+                            TraineesCount = tg.Enrollments.Count(e => e.IsActive && !e.IsDeleted),
+                            TotalEnrolled = tg.Enrollments.Count(e => e.IsActive && !e.IsDeleted),
+                            TotalPresent = so.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Present),
+                            TotalAbsent = so.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Absent),
+                            TotalLate = so.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Excused)
+                        })
+                        .OrderBy(so => so.StartDateTime)
+                        .ToList()
+                })
+                .ToListAsync(ct);
+
+            return new PagedData<SessionGroupCardDto>
+            {
+                Items = groups,
+                TotalCount = totalCount,
+                Page = page.Page,
+                PageSize = page.PageSize
+            };
+        }
+
         public async Task<bool> ExistsByScheduleAndDateTimeAsync(int groupScheduleId, DateTime startDateTime, CancellationToken ct = default)
             => await _context.SessionOccurrences
                 .AnyAsync(s => s.GroupScheduleId == groupScheduleId && s.StartDateTime == startDateTime, ct);
