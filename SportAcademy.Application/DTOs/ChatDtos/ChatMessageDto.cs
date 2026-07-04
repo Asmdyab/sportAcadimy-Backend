@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SportAcademy.Domain.Enums;
+﻿using SportAcademy.Domain.Enums;
 
+namespace SportAcademy.Application.DTOs.ChatDtos;
 
-namespace SportAcademy.Application.DTOs.ChatDtos
+public class ChatMessageDto
 {
-    public record ChatMessageDto(
-        Guid Id,
-        ChatRole Role,
-        string Content,
-        DateTime CreatedAt
-    );
+    public Guid Id { get; set; }
+    public string Role { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
 }

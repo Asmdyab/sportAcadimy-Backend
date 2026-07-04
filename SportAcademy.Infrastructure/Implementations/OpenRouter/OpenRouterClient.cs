@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SportAcademy.Application.DTOs.ChatDtos;
 using SportAcademy.Application.Interfaces;
 using SportAcademy.Domain.Entities;
 using System.Net.Http.Headers;
@@ -17,7 +18,7 @@ public class OpenRouterClient : IOpenRouterClient
     {
         _httpClient = httpClient;
         _apiKey = configuration["OpenRouterSettings:ApiKey"]!;
-        _model = configuration["OpenRouterSettings:Model"] ?? "google/gemma-3-12b-it:free";
+        _model = configuration["OpenRouterSettings:Model"] ?? "mistralai/mistral-7b-instruct:free";
     }
 
     public async Task<string> SendAsync(
@@ -103,5 +104,89 @@ public class OpenRouterClient : IOpenRouterClient
             .GetProperty("message")
             .GetProperty("content")
             .GetString()!;
+    }
+
+    public async Task<OpenRouterResponseDto> SendWithToolsAsync(
+        IReadOnlyList<ChatApiMessage> messages,
+        IReadOnlyList<ToolDefinitionDto>? tools,
+        CancellationToken cancellationToken)
+    {
+        var requestObj = new Dictionary<string, object>
+        {
+            ["model"] = _model,
+            ["messages"] = messages.Select(BuildMessagePayload).ToList()
+        };
+
+        if (tools is { Count: > 0 })
+        {
+            requestObj["tools"] = tools;
+        }
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post,
+            "https://openrouter.ai/api/v1/chat/completions");
+
+        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        httpRequest.Headers.Add("HTTP-Referer", "https://sportacademy.app");
+        httpRequest.Headers.Add("X-Title", "SportAcademy Chatbot");
+
+        httpRequest.Content = new StringContent(
+            JsonSerializer.Serialize(requestObj),
+            Encoding.UTF8,
+            "application/json");
+
+        var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new HttpRequestException(
+                $"OpenRouter API error ({response.StatusCode}): {json}");
+        }
+
+        var result = JsonSerializer.Deserialize<OpenRouterResponseDto>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        return result!;
+    }
+
+    private static object BuildMessagePayload(ChatApiMessage msg)
+    {
+        if (msg.Role == "tool")
+        {
+            return new
+            {
+                role = "tool",
+                tool_call_id = msg.ToolCallId,
+                content = msg.Content ?? ""
+            };
+        }
+
+        if (msg.ToolCalls is { Count: > 0 })
+        {
+            return new
+            {
+                role = "assistant",
+                content = msg.Content,
+                tool_calls = msg.ToolCalls.Select(tc => new
+                {
+                    id = tc.Id,
+                    type = "function",
+                    function = new
+                    {
+                        name = tc.Function.Name,
+                        arguments = tc.Function.Arguments
+                    }
+                })
+            };
+        }
+
+        return new
+        {
+            role = msg.Role,
+            content = msg.Content ?? ""
+        };
     }
 }

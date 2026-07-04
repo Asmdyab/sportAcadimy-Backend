@@ -13,6 +13,7 @@ using SportAcademy.Application.Interfaces;
 using SportAcademy.Application.Mappings.TraineeProfile;
 using SportAcademy.Application.Services;
 using SportAcademy.Application.Services.PaymentServices;
+using SportAcademy.Application.Services.ToolPlugins;
 using SportAcademy.Application.Validators.TraineeValidators;
 using SportAcademy.Domain.Contract;
 using SportAcademy.Domain.Entities;
@@ -210,6 +211,14 @@ builder.Services.AddScoped<IChatConversationRepository, ChatConversationReposito
 builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 
 builder.Services.AddScoped<IChatBotService, ChatBotService>();
+
+builder.Services.AddScoped<IToolRegistry, ToolRegistry>();
+
+builder.Services.AddScoped<IToolPlugin, SportsPlugin>();
+builder.Services.AddScoped<IToolPlugin, TraineePlugin>();
+builder.Services.AddScoped<IToolPlugin, SchedulePlugin>();
+builder.Services.AddScoped<IToolPlugin, EnrollmentPlugin>();
+builder.Services.AddScoped<IToolPlugin, BranchCoachPlugin>();
 
 builder.Services.AddHttpClient<IOpenRouterClient, OpenRouterClient>();
 
