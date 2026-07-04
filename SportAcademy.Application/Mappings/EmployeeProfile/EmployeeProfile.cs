@@ -32,9 +32,15 @@ namespace SportAcademy.Application.Mappings.EmployeeProfile
                     src.SecondNumber))
                 .ForMember(dest => dest.Nationality,
                     opt => opt.MapFrom(src =>
-                    Enum.Parse<Nationality>(src.Nationality)));
+                    Enum.Parse<Nationality>(src.Nationality, true)));
 
-            CreateMap<CreateEmployeeDto, Employee>();
+            CreateMap<CreateEmployeeDto, Employee>()
+                .ForMember(dest => dest.Address,
+                    opt => opt.MapFrom(src =>
+                    Address.Create(src.Street, src.City)))
+                .ForMember(dest => dest.Nationality,
+                    opt => opt.MapFrom(src =>
+                    Enum.Parse<Nationality>(src.Nationality, true)));
 
             CreateMap<UpdateEmployeeCommand, Employee>()
                 .ForAllMembers(opts => opts.Condition((_, _, srcMember) => srcMember != null));

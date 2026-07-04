@@ -16,7 +16,9 @@ namespace SportAcademy.Application.DTOs.EmployeeDtos
         public decimal Salary { get; init; }
         public Gender Gender { get; init; }
         public DateOnly BirthDate { get; init; }
-        public string Address { get; init; } = null!;
+        public string Nationality { get; init; } = null!;
+        public string Street { get; init; } = null!;
+        public string City { get; init; } = null!;
         public string PhoneNumber { get; init; } = null!;
         public string? SecondNumber { get; init; }
         public Position Position { get; init; }

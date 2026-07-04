@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using SportAcademy.Application.DTOs.EmployeeDtos;
+using SportAcademy.Domain.Enums;
 
 namespace SportAcademy.Application.Validators.EmployeeValidators
 {
@@ -35,9 +36,13 @@ namespace SportAcademy.Application.Validators.EmployeeValidators
                 .LessThan(DateOnly.FromDateTime(DateTime.Now.AddYears(-16)))
                 .WithMessage("Employee must be at least 16 years old.");
 
-            RuleFor(x => x.Address)
-                .NotEmpty().WithMessage("Address is required.")
-                .MaximumLength(200).WithMessage("Address can't exceed 200 characters.");
+            RuleFor(x => x.Street)
+                .NotEmpty().WithMessage("Street is required.")
+                .MaximumLength(200).WithMessage("Street can't exceed 200 characters.");
+
+            RuleFor(x => x.City)
+                .NotEmpty().WithMessage("City is required.")
+                .MaximumLength(200).WithMessage("City can't exceed 200 characters.");
 
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("Phone number is required.")
@@ -50,6 +55,11 @@ namespace SportAcademy.Application.Validators.EmployeeValidators
 
             RuleFor(x => x.Position)
                 .IsInEnum().WithMessage("Invalid position value.");
+
+            RuleFor(x => x.Nationality)
+                .NotEmpty().WithMessage("Nationality is required.")
+                .Must(value => Enum.TryParse<Nationality>(value, ignoreCase: true, out _))
+                .WithMessage("Invalid nationality value.");
 
             RuleFor(x => x.BranchId)
                 .GreaterThan(0).WithMessage("Please select a valid branch.");

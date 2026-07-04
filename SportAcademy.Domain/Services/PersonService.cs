@@ -17,10 +17,22 @@ namespace SportAcademy.Domain.Services
 
         public string GeneratePassword()
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
-            var password = new string(Enumerable.Repeat(chars, 12)
-                .Select(s => s[Random.Shared.Next(s.Length)]).ToArray());
-            return password;
+            const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lower = "abcdefghijklmnopqrstuvwxyz";
+            const string digits = "0123456789";
+            const string special = "!@#$%^&*()";
+            const string all = upper + lower + digits + special;
+
+            var chars = new List<char>
+            {
+                digits[Random.Shared.Next(digits.Length)]
+            };
+
+            chars.AddRange(
+                Enumerable.Range(0, 11).Select(_ => all[Random.Shared.Next(all.Length)])
+            );
+
+            return string.Join(null, chars.OrderBy(_ => Random.Shared.Next()));
         }
 
         public bool IsSSNValid(string ssn, DateOnly birthDate)
