@@ -39,6 +39,15 @@ namespace SportAcademy.Application.Validators.TraineeGroupValidators
             RuleFor(x => x.CoachId)
                 .NotEmpty().WithMessage("Please select a coach.")
                 .GreaterThan(0).WithMessage("Coach ID must be a valid number.");
+
+            RuleForEach(x => x.Schedules).ChildRules(schedule =>
+            {
+                schedule.RuleFor(x => x.Day)
+                    .NotEmpty().WithMessage("Please select a day for the schedule.")
+                    .IsInEnum().WithMessage("Invalid day selected.");
+                schedule.RuleFor(x => x.StartTime)
+                    .NotEmpty().WithMessage("Please enter a start time for the schedule.");
+            });
         }
     }
 }

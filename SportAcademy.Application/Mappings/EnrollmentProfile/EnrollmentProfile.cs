@@ -43,7 +43,13 @@ namespace SportAcademy.Application.Mappings.EnrollmentProfile
                 .ForMember(dest => dest.SessionsCompleted,
                     opt => opt.MapFrom(src => src.SessionAllowed - src.SessionRemaining))
                 .ForMember(dest => dest.TotalSessions,
-                    opt => opt.MapFrom(src => src.SessionAllowed));
+                    opt => opt.MapFrom(src => src.SessionAllowed))
+                .ForMember(dest => dest.ExpiryDate,
+                    opt => opt.MapFrom(src => src.ExpiryDate))
+                .ForMember(dest => dest.SessionAllowed,
+                    opt => opt.MapFrom(src => src.SessionAllowed))
+                .ForMember(dest => dest.SubscriptionDetailsId,
+                    opt => opt.MapFrom(src => src.SubscriptionDetailsId));
         }
     }
 }

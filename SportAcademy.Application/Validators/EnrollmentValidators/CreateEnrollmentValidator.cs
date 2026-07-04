@@ -19,11 +19,6 @@ namespace SportAcademy.Application.Validators.EnrollmentValidators
                 .GreaterThan(x => x.EnrollmentDate)
                 .WithMessage("Expiry date should be after the enrollment date.");
 
-            RuleFor(x => x.SessionAllowed)
-                .NotEmpty().WithMessage("Please specify the number of sessions allowed.")
-                .GreaterThan(0).WithMessage("At least 1 session must be allowed.")
-                .LessThanOrEqualTo(100).WithMessage("Maximum 100 sessions can be allowed.");
-
             RuleFor(x => x.TraineeId)
                 .NotEmpty().WithMessage("Please select a trainee.")
                 .GreaterThan(0).WithMessage("Please select a valid trainee.");

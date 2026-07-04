@@ -12,6 +12,7 @@ using SportAcademy.Application.Commands.Trainees.CreateTrainee;
 using SportAcademy.Application.Interfaces;
 using SportAcademy.Application.Mappings.TraineeProfile;
 using SportAcademy.Application.Services;
+using SportAcademy.Application.Services.PaymentServices;
 using SportAcademy.Application.Validators.TraineeValidators;
 using SportAcademy.Domain.Contract;
 using SportAcademy.Domain.Entities;
@@ -189,6 +190,8 @@ builder.Services.AddScoped<ISubscriptionDetailsRepository, SubscriptionDetailsRe
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 builder.Services.AddScoped<SubDetailsManagementService>();
+
+builder.Services.AddScoped<PaymentNumberService>();
 
 builder.Services.AddScoped<TraineeGroupService>();
 

@@ -35,6 +35,18 @@ namespace SportAcademy.Application.Commands.TraineeGroupCommands.CreateTraineeGr
             var tgName = await _traineeGroupService.GenerateTraineeGroupNameAsync(request);
             traineeGroup.Name = tgName;
 
+            if (request.Schedules?.Count > 0)
+            {
+                foreach (var entry in request.Schedules)
+                {
+                    traineeGroup.GroupSchedules.Add(new GroupSchedule
+                    {
+                        Day = entry.Day,
+                        StartTime = entry.StartTime
+                    });
+                }
+            }
+
             await _traineeGroupRepository.AddAsync(traineeGroup, cancellationToken);
 
             cancellationToken.ThrowIfCancellationRequested();

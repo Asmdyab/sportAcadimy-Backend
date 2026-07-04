@@ -10,6 +10,7 @@ using SportAcademy.Application.Queries.TraineeGroupQueries.GetAll;
 using SportAcademy.Application.Queries.TraineeGroupQueries.GetAllCount;
 using SportAcademy.Application.Queries.TraineeGroupQueries.GetAllOfSpecificDay;
 using SportAcademy.Application.Queries.TraineeGroupQueries.GetById;
+using SportAcademy.Application.Queries.TraineeGroupQueries.GetDropdown;
 using SportAcademy.Application.Queries.TraineeGroupQueries.SearchTraineeGroup;
 
 namespace SportAcademy.Web.Controllers
@@ -96,6 +97,13 @@ namespace SportAcademy.Web.Controllers
         {
             var result = await _mediator.Send(
                 new SearchTraineeGroupQuery(searchTerm, PageRequest.Create(page, pageSize)), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("dropdown")]
+        public async Task<IActionResult> GetDropdown(CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetTraineeGroupsDropdownQuery(), ct);
             return Ok(result);
         }
     }

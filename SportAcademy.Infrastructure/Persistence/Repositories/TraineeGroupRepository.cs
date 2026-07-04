@@ -99,6 +99,19 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                 PageSize = page.PageSize
             };
         }
+
+        public async Task<List<TraineeGroupDropdownDto>> GetDropdownListAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.TraineeGroups
+                .AsNoTracking()
+                .Select(tg => new TraineeGroupDropdownDto
+                {
+                    Id = tg.Id,
+                    Name = tg.Name,
+                    SportId = tg.Coach.SportId
+                })
+                .ToListAsync(cancellationToken);
+        }
     }
 
 }

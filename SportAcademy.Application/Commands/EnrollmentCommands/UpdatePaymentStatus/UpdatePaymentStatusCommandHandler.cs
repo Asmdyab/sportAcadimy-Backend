@@ -7,18 +7,12 @@ namespace SportAcademy.Application.Commands.EnrollmentCommands.UpdatePaymentStat
 public class UpdatePaymentStatusCommandHandler : IRequestHandler<UpdatePaymentStatusCommand, Result<bool>>
 {
     private readonly IEnrollmentRepository _enrollmentRepository;
-    private readonly ISubscriptionDetailsRepository _subscriptionRepository;
-    private readonly IPaymentRepository _paymentRepository;
     private readonly string _operationType = "UpdatePaymentStatus";
 
     public UpdatePaymentStatusCommandHandler(
-        IEnrollmentRepository enrollmentRepository,
-        ISubscriptionDetailsRepository subscriptionRepository,
-        IPaymentRepository paymentRepository)
+        IEnrollmentRepository enrollmentRepository)
     {
         _enrollmentRepository = enrollmentRepository;
-        _subscriptionRepository = subscriptionRepository;
-        _paymentRepository = paymentRepository;
     }
 
     public async Task<Result<bool>> Handle(UpdatePaymentStatusCommand request, CancellationToken cancellationToken)
@@ -26,6 +20,18 @@ public class UpdatePaymentStatusCommandHandler : IRequestHandler<UpdatePaymentSt
         var enrollment = await _enrollmentRepository.GetByIdAsync(request.Id, cancellationToken);
         if (enrollment == null)
             return Result<bool>.Failure(_operationType, "Enrollment not found", 404);
+
+        switch (request.PaymentStatus.ToLowerInvariant())
+        {
+            case "paid":
+                enrollment.SessionRemaining = 0;
+                break;
+            case "pending":
+                enrollment.SessionRemaining = enrollment.SessionAllowed;
+                break;
+        }
+
+        await _enrollmentRepository.UpdateAsync(enrollment, cancellationToken);
 
         return Result<bool>.Success(true, _operationType);
     }

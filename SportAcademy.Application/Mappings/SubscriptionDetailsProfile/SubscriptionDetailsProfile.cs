@@ -57,8 +57,13 @@ namespace SportAcademy.Application.Mappings.SubscriptionDetailsProfile
                 )
                 .ForMember(
                     dest => dest.Price,
-                    opt => opt.MapFrom(src => src.SportPrice.Price)
+                    opt => opt.Ignore()
                 )
+                .AfterMap((src, dest) => {
+                    var months = (src.EndDate.Year - src.StartDate.Year) * 12 + src.EndDate.Month - src.StartDate.Month;
+                    if (src.EndDate.Day > src.StartDate.Day) months++;
+                    dest.Price = src.SportPrice.Price * (months < 1 ? 1 : months);
+                })
                 .ReverseMap()
                 .ForAllMembers(
                     opt => opt.Condition((src, dest, srcMember) => srcMember != null)

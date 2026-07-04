@@ -31,14 +31,18 @@ namespace SportAcademy.Application.Commands.EnrollmentCommands.CreateEnrollment
             var enrollment = _mapper.Map<Enrollment>(request)
                 ?? throw new AutoMapperMappingException("Error occurred while mapping.");
 
-            // Set initial values
             var subDetails = await _subRepository.GetSubscriptionDetailsWithSubTypeAsync(
                 request.SubscriptionDetailsId, cancellationToken)
-                ?? throw new SubscriptionDetailsNotFoundException(request.SubscriptionDetailsId
-                .ToString());
+                ?? throw new SubscriptionDetailsNotFoundException(request.SubscriptionDetailsId.ToString());
 
-            var daysPerMonth = SubscriptionDetailsService.CalculateAllowedSessions(subDetails);
-            enrollment.SessionAllowed = daysPerMonth;
+            if (DateOnly.FromDateTime(request.EnrollmentDate) > subDetails.EndDate)
+            {
+                throw new InvalidOperationException("Enrollment date cannot be after the subscription end date.");
+            }
+
+            // Calculate sessionAllowed from subscription
+            enrollment.SessionAllowed = SubscriptionDetailsService.CalculateAllowedSessions(subDetails);
+
             enrollment.SessionRemaining = enrollment.SessionAllowed;
             enrollment.IsActive = true;
 

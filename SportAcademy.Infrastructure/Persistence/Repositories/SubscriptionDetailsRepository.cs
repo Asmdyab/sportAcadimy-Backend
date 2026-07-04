@@ -49,7 +49,12 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                 .Select(s => new SubDetailsDropdownDto
                 {
                     Id = s.Id,
-                    Name = s.SportPrice.SportSubscriptionType.SubscriptionType.Name.ToString()
+                    Name = s.SportPrice.SportSubscriptionType.SubscriptionType.Name.ToString(),
+                    EndDate = s.EndDate,
+                    SportId = s.SportId,
+                    SportName = s.SportPrice.SportSubscriptionType.Sport.Name,
+                    TraineeId = s.TraineeId,
+                    TraineeName = s.Trainee.FirstName + " " + s.Trainee.LastName
                 })
                 .ToListAsync(cancellationToken);
 

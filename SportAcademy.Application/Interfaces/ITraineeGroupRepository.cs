@@ -12,5 +12,6 @@ namespace SportAcademy.Application.Interfaces
         Task<TraineeGroupDetailDto?> GetDetailsByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<TraineeGroup?> GetByIdWithSchedulesAsync(int id, CancellationToken cancellationToken = default);
         Task<PagedData<ListTraineeGroupDto>> SearchAsync(string term, PageRequest page, CancellationToken cancellationToken = default);
+        Task<List<TraineeGroupDropdownDto>> GetDropdownListAsync(CancellationToken cancellationToken = default);
     }
 }

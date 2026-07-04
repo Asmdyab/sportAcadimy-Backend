@@ -10,6 +10,7 @@ public record EnrollmentCardDto
     public string? Branch { get; init; }
     public string? CoachName { get; init; }
     public DateTime? EnrollmentDate { get; init; }
+    public DateTime? ExpiryDate { get; init; }
     public DateTime? StartDate { get; init; }
     public DateTime? EndDate { get; init; }
     public decimal? MonthlyFee { get; init; }
@@ -17,4 +18,6 @@ public record EnrollmentCardDto
     public string Status { get; init; } = string.Empty;
     public int? SessionsCompleted { get; init; }
     public int? TotalSessions { get; init; }
+    public int? SessionAllowed { get; init; }
+    public int? SubscriptionDetailsId { get; init; }
 }

@@ -19,7 +19,7 @@ namespace SportAcademy.Application.Validators.SubscriptionDetailsValidators
 
             RuleFor(x => x.EndDate)
                 .NotEmpty().WithMessage("Please select an end date.")
-                .GreaterThan(x => x.StartDate)
+                .GreaterThanOrEqualTo(x => x.StartDate)
                 .WithMessage("End date should be after the start date.");
 
             RuleFor(x => x.PaymentNumber)
