@@ -41,5 +41,6 @@ namespace SportAcademy.Application.Interfaces
             string? status,
             string? paymentStatus,
             CancellationToken ct = default);
+        Task<PagedData<EnrollmentCardDto>> GetByTraineeIdAsync(int traineeId, PageRequest page, CancellationToken ct = default);
     }
 }

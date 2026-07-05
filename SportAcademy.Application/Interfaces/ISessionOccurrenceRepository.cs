@@ -12,5 +12,6 @@ namespace SportAcademy.Application.Interfaces
         Task<PagedData<SessionGroupCardDto>> SearchGroupsAsync(string term, PageRequest page, CancellationToken ct = default);
         Task<int> GetCountAsync(CancellationToken ct = default);
         Task<bool> ExistsByScheduleAndDateTimeAsync(int groupScheduleId, DateTime startDateTime, CancellationToken ct = default);
+        Task<PagedData<SessionOccurrenceCardDto>> GetByTraineeIdAsync(int traineeId, PageRequest page, CancellationToken ct = default);
     }
 }

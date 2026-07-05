@@ -16,6 +16,7 @@ using SportAcademy.Application.Queries.EnrollmentQueries.GetById;
 using SportAcademy.Application.Queries.EnrollmentQueries.GetEnrollmentsCount;
 using SportAcademy.Application.Queries.EnrollmentQueries.GetEnrollmentsCountForSport;
 using SportAcademy.Application.Queries.EnrollmentQueries.GetEnrollmentsCountForSports;
+using SportAcademy.Application.Queries.EnrollmentQueries.GetByTrainee;
 using SportAcademy.Application.Queries.EnrollmentQueries.GetPendingPaymentsCount;
 using SportAcademy.Application.Queries.EnrollmentQueries.SearchEnrollment;
 
@@ -49,6 +50,17 @@ namespace SportAcademy.Web.Controllers
         {
             var result = await _mediator.Send(new GetAllEnrollmentsQuery(
                 PageRequest.Create(page, pageSize), status, paymentStatus));
+            return Ok(result);
+        }
+
+        [HttpGet("by-trainee/{traineeId}")]
+        public async Task<IActionResult> GetByTrainee(
+            [FromRoute] int traineeId,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
+        {
+            var result = await _mediator.Send(new GetEnrollmentsByTraineeQuery(
+                traineeId, PageRequest.Create(page, pageSize)));
             return Ok(result);
         }
 

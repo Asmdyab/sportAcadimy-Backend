@@ -17,12 +17,13 @@ using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetById;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetCount;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetByDate;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetGroupsByDate;
+using SportAcademy.Application.Queries.SessionOccurrenceQueries.GetByTrainee;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.SearchGroups;
 using SportAcademy.Application.Queries.SessionOccurrenceQueries.SearchSessionOccurrence;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize(Roles = "Admin,Coach,Manager")]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
     [ApiController]
     public class SessionOccurrenceController : ControllerBase
@@ -96,6 +97,18 @@ namespace SportAcademy.Web.Controllers
         {
             var result = await _mediator.Send(
                 new GetSessionOccurrencesByDateQuery(date, PageRequest.Create(page, pageSize), traineeGroupId), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("by-trainee/{traineeId}")]
+        public async Task<IActionResult> GetByTrainee(
+            [FromRoute] int traineeId,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize,
+            CancellationToken ct)
+        {
+            var result = await _mediator.Send(
+                new GetSessionOccurrencesByTraineeQuery(traineeId, PageRequest.Create(page, pageSize)), ct);
             return Ok(result);
         }
 

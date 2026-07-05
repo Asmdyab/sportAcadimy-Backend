@@ -133,6 +133,32 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
             return (total, attended);
         }
 
+        public async Task<PagedData<TraineeAttendanceReportDto>> GetAttendanceReportByTraineeAsync(int traineeId, PageRequest page, CancellationToken ct = default)
+        {
+            return await _context.TraineeAttendanceReports
+                .Where(v => v.TraineeId == traineeId)
+                .Select(v => new TraineeAttendanceReportDto(
+                    v.TraineeId,
+                    v.FirstName,
+                    v.LastName,
+                    v.GroupId,
+                    v.GroupName,
+                    v.SportName,
+                    v.BranchName,
+                    v.SubscriptionStartDate,
+                    v.SubscriptionEndDate,
+                    v.EnrollmentId,
+                    v.IsActive,
+                    v.TotalSessions,
+                    v.AttendedSessions,
+                    v.AbsentSessions,
+                    v.AttendanceRate,
+                    v.AbsenceRate,
+                    0
+                ))
+                .ToPagedDataAsync(page, ct);
+        }
+
         public async Task<PagedData<TraineeAttendanceReportDto>> GetAttendanceReportAsync(
             PageRequest page,
             CancellationToken cancellationToken = default)

@@ -415,6 +415,13 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
             return Task.CompletedTask;
         }
 
+        public async Task<TraineeDetailsDto?> GetByAppUserIdAsync(string appUserId, CancellationToken cancellationToken = default)
+            => await _context.Trainees
+                .Where(t => t.AppUserId == appUserId)
+                .AsNoTracking()
+                .ProjectTo<TraineeDetailsDto>(_mapper.ConfigurationProvider)
+                .SingleOrDefaultAsync(cancellationToken);
+
         public async Task<TraineeCode> GenerateTraineeCodeAsync(int familyId, int branchId, int nationalityCategoryId, AgeCategory ageCategory, CancellationToken cancellationToken = default)
         {
             var nationalityCode = await _context.NationalityCategories

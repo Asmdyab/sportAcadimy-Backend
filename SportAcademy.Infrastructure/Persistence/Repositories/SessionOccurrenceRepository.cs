@@ -200,6 +200,33 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
             };
         }
 
+        public async Task<PagedData<SessionOccurrenceCardDto>> GetByTraineeIdAsync(int traineeId, PageRequest page, CancellationToken ct = default)
+        {
+            var query = _context.SessionOccurrences
+                .Where(s => s.GroupSchedule.TraineeGroup.Enrollments
+                    .Any(e => e.TraineeId == traineeId && !e.IsDeleted));
+
+            var projected = query.Select(s => new SessionOccurrenceCardDto
+            {
+                Id = s.Id,
+                SportName = s.GroupSchedule.TraineeGroup.Coach.Sport.Name,
+                CoachName = s.GroupSchedule.TraineeGroup.Coach.Employee.FirstName + " " + s.GroupSchedule.TraineeGroup.Coach.Employee.LastName,
+                BranchName = s.GroupSchedule.TraineeGroup.Branch.Name,
+                StartTime = s.StartDateTime,
+                DurationInMinutes = s.GroupSchedule.TraineeGroup.DurationInMinutes,
+                TraineeGroupId = s.GroupSchedule.TraineeGroup.Id,
+                TraineeGroupName = s.GroupSchedule.TraineeGroup.Name,
+                TraineesCount = s.GroupSchedule.TraineeGroup.Enrollments.Count(e => e.IsActive && !e.IsDeleted),
+                TotalEnrolled = s.GroupSchedule.TraineeGroup.Enrollments.Count(e => e.IsActive && !e.IsDeleted),
+                TotalPresent = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Present),
+                TotalAbsent = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Absent),
+                TotalLate = s.Attendances.Count(a => a.AttendanceStatus == AttendanceStatus.Excused),
+                Date = s.StartDateTime.Date
+            });
+
+            return await projected.ToPagedDataAsync(page, ct);
+        }
+
         public async Task<bool> ExistsByScheduleAndDateTimeAsync(int groupScheduleId, DateTime startDateTime, CancellationToken ct = default)
             => await _context.SessionOccurrences
                 .AnyAsync(s => s.GroupScheduleId == groupScheduleId && s.StartDateTime == startDateTime, ct);

@@ -184,6 +184,17 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                 .ToPagedDataAsync(page, ct);
         }
 
+        public async Task<PagedData<EnrollmentCardDto>> GetByTraineeIdAsync(int traineeId, PageRequest page, CancellationToken ct = default)
+        {
+            var query = _context.Enrollments
+                .AsNoTracking()
+                .Where(e => !e.IsDeleted && e.TraineeId == traineeId);
+
+            return await query
+                .ProjectTo<EnrollmentCardDto>(_mapper.ConfigurationProvider)
+                .ToPagedDataAsync(page, ct);
+        }
+
         public async Task<PagedData<EnrollmentCardDto>> GetAllPaginatedAsync(
             PageRequest page,
             string? status,

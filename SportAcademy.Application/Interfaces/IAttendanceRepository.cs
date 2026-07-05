@@ -35,5 +35,6 @@ namespace SportAcademy.Application.Interfaces
         Task<List<AttendanceRecordDto>> GetBySessionAsync(int sessionOccurrenceId, CancellationToken ct = default);
 
         Task<List<AttendanceByDateRecordDto>> GetByDateAsync(DateTime date, CancellationToken ct = default);
+        Task<PagedData<TraineeAttendanceReportDto>> GetAttendanceReportByTraineeAsync(int traineeId, PageRequest page, CancellationToken ct = default);
     }
 }

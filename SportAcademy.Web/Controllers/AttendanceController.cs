@@ -11,6 +11,7 @@ using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceByDate;
 using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceBySession;
 using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceRate;
 using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceReport;
+using SportAcademy.Application.Queries.AttendanceQueries.GetAttendanceReportByTrainee;
 using SportAcademy.Application.Queries.AttendanceQueries.GetById;
 using SportAcademy.Application.Queries.AttendanceQueries.GetGlobalAttendanceRate;
 using SportAcademy.Application.Queries.BranchQueries.GetAll;
@@ -18,7 +19,7 @@ using SportAcademy.Domain.Enums;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize(Roles = "Admin,Coach,Manager")]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
     [ApiController]
     public class AttendanceController : ControllerBase
@@ -113,6 +114,19 @@ namespace SportAcademy.Web.Controllers
             return Ok(result);
         }
 
+
+        // GET api/attendance/report/by-trainee/5?page=1&pageSize=10
+        [HttpGet("report/by-trainee/{traineeId}")]
+        public async Task<IActionResult> GetAttendanceReportByTrainee(
+            [FromRoute] int traineeId,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize,
+            CancellationToken ct)
+        {
+            var result = await _mediator.Send(
+                new GetAttendanceReportByTraineeQuery(traineeId, PageRequest.Create(page, pageSize)), ct);
+            return Ok(result);
+        }
 
         // GET api/attendance/report?page=1&pageSize=10
         [AllowAnonymous]

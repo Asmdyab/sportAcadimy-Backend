@@ -34,12 +34,12 @@ namespace SportAcademy.Infrastructure.Persistence.Repositories
                 .SingleOrDefaultAsync(cancellationToken);
 
         public async Task<List<SubscriptionDetails>?> GetSubscriptionDetailsForTraineeAsync(int traineeId, CancellationToken cancellationToken = default)
-            => await _context.SubscriptionDetails
+            => await GetFullSubDetails()
                 .Where(sd => sd.TraineeId == traineeId)
                 .ToListAsync(cancellationToken);
 
         public async Task<List<SubscriptionDetails>?> GetActiveSubscriptionDetailsForTraineeAsync(int traineeId, CancellationToken cancellationToken = default)
-            => await _context.SubscriptionDetails
+            => await GetFullSubDetails()
                 .Where(sd => sd.TraineeId == traineeId && sd.IsActive)
                 .ToListAsync(cancellationToken);
 

@@ -6,11 +6,12 @@ using SportAcademy.Application.Commands.SubscriptionDetailsCommands.DeleteSubscr
 using SportAcademy.Application.Commands.SubscriptionDetailsCommands.UpdateSubscriptionDetails;
 using SportAcademy.Application.Queries.SubscriptionDetailsQueries.GetAll;
 using SportAcademy.Application.Queries.SubscriptionDetailsQueries.GetById;
+using SportAcademy.Application.Queries.SubscriptionDetailsQueries.GetByTrainee;
 using SportAcademy.Application.Queries.SubscriptionDetailsQueries.GetSubDetailsDropdown;
 
 namespace SportAcademy.Web.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Coach,Manager,Trainee")]
     [Route("api/[controller]")]
     [ApiController]
     public class SubscriptionDetailsController : ControllerBase
@@ -26,6 +27,13 @@ namespace SportAcademy.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var result = await _mediator.Send(new GetAllSubDetailsQuery());
+            return Ok(result);
+        }
+
+        [HttpGet("by-trainee/{traineeId}")]
+        public async Task<IActionResult> GetByTrainee(int traineeId)
+        {
+            var result = await _mediator.Send(new GetSubDetailsByTraineeQuery(traineeId));
             return Ok(result);
         }
 
